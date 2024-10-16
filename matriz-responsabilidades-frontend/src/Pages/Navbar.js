@@ -8,6 +8,7 @@ const Navbar = () => (
       <li><Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Inicio</Link></li>
       <li><Link to="/proyectos" style={{ color: 'white', textDecoration: 'none' }}>Proyectos</Link></li>
       <li><Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>Login</Link></li>
+      <li><Link to="/SignUp" style={{ color: 'white', textDecoration: 'none' }}>SignUp</Link></li>
     </ul>
   </nav>
 );
