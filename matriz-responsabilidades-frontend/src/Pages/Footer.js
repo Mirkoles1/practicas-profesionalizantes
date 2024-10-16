@@ -1,4 +1,4 @@
-// Components/Footer.js
+// Pages/Footer.js
 import React from 'react';
 
 const Footer = () => (
