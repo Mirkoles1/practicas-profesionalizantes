@@ -1,33 +1,27 @@
-// Dashboard.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { PieChart, Pie, Tooltip } from 'recharts';
 
-const Dashboard = ({ user }) => {
+const Dashboard = () => {
   const [proyectos, setProyectos] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:4000/api/proyectos', {
       headers: { Authorization: token }
-    })
-      .then(response => setProyectos(response.data))
-      .catch(error => console.error('Error al obtener proyectos:', error));
+    }).then(response => setProyectos(response.data));
   }, []);
 
+  const data = proyectos.map(p => ({
+    name: p.nombre,
+    value: p.empleados.length,
+  }));
+
   return (
-    <div>
-      <h1>Bienvenido, {user?.username}</h1>
-      {user?.rol === 'admin' && <p>Eres administrador.</p>}
-      <ul>
-        {proyectos.map(proyecto => (
-          <li key={proyecto.id} onClick={() => navigate(`/proyectos/${proyecto.id}`)}>
-            {proyecto.nombre} - {proyecto.estado}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <PieChart width={400} height={400}>
+      <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#82ca9d" />
+      <Tooltip />
+    </PieChart>
   );
 };
 

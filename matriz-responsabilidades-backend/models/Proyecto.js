@@ -1,32 +1,27 @@
+// models/Proyecto.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../database'); // Asegúrate de que la conexión sea correcta
+const sequelize = require('../database'); // Asegúrate de que la importación es correcta
 
-// Definir el modelo Proyecto, sincronizando con la tabla existente
+// Definir el modelo Proyecto
 const Proyecto = sequelize.define('Proyecto', {
-    nombre: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    descripcion: {
-        type: DataTypes.TEXT,
-        allowNull: true,  // Campo opcional
-    },
-    estado: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'Activo',
-    },
-    fecha_inicio: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
-    fecha_fin: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
-}, {
-    tableName: 'proyecto',  // Asegúrate de que coincida con el nombre exacto de la tabla
-    timestamps: true,  // Esto añade createdAt y updatedAt, asegúrate de que estos campos existan en tu tabla
+  nombre: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  descripcion: {
+    type: DataTypes.TEXT,
+  },
+  estado: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'Activo',
+  },
+  fecha_inicio: {
+    type: DataTypes.DATE,
+  },
+  fecha_fin: {
+    type: DataTypes.DATE,
+  },
 });
 
 module.exports = Proyecto;
