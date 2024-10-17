@@ -1,29 +1,21 @@
+// models/Usuario.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../database'); // Asegúrate de que la conexión sea correcta
+const sequelize = require('../database');
 
-// Definir el modelo Usuario, sincronizando con la tabla existente
 const Usuario = sequelize.define('Usuario', {
-    username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    rol: {
-        type: DataTypes.ENUM('admin', 'empleado'),
-        allowNull: false,
-    },
-}, {
-    tableName: 'usuario',  // Asegúrate de que coincida con el nombre exacto de la tabla
-    timestamps: false, // Desactiva los campos createdAt y updatedAt
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  rol: {
+    type: DataTypes.ENUM('admin', 'empleado'),
+    allowNull: false,
+  },
 });
 
 module.exports = Usuario;
