@@ -23,7 +23,7 @@ const Usuario = sequelize.define('Usuario', {
     },
 }, {
     tableName: 'usuario',  // Asegúrate de que coincida con el nombre exacto de la tabla
-    timestamps: true,  // Asegúrate de que tu tabla tenga createdAt y updatedAt
+    timestamps: false, // Desactiva los campos createdAt y updatedAt
 });
 
 module.exports = Usuario;

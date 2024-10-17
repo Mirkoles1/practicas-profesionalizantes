@@ -11,20 +11,19 @@ const SECRET = 'tu_secreto_jwt';
 router.post('/register', async (req, res) => {
     const { username, email, password, rol } = req.body;
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await Usuario.create({
-            username,
-            email,
-            password: hashedPassword,
-            rol
-        });
-        res.status(201).json(newUser);
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await Usuario.create({
+        username,
+        email,
+        password: hashedPassword,
+        rol
+      });
+      res.status(201).json(newUser);
     } catch (error) {
-        res.status(500).json({ error: 'El nombre de usuario o correo ya existe o hubo un error.' });
+      console.error(error); // Esto imprimirá el error detallado en la consola
+      res.status(500).json({ error: error.message });
     }
-});
-
-
+  });
 
 // Login de usuario
 router.post('/login', async (req, res) => {
