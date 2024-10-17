@@ -10,6 +10,7 @@ import ProyectoDetalle from './Components/ProyectoDetalle';
 import LoginForm from './Components/LoginForm';
 import SignUp from './Components/SignUp'; // Asegúrate de importar el componente de registro
 
+
 const App = () => {
     return (
         <Router>
