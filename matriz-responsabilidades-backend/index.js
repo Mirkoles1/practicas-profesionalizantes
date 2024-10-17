@@ -20,13 +20,12 @@ app.get('/', (req, res) => {
 });
 
 // Sincroniza los modelos con la base de datos
-sequelize.sync({ force: false })  // Usa { force: true } para reiniciar las tablas (solo en desarrollo)
+sequelize.sync({ force: false, alter: false })  // Sin crear ni modificar tablas
     .then(() => {
-        console.log('Tablas sincronizadas con éxito.');
-
-        // Inicia el servidor solo si la sincronización es exitosa
+        console.log('Conexión establecida con la base de datos.');
         app.listen(PORT, () => {
             console.log(`Servidor escuchando en el puerto ${PORT}`);
         });
     })
-    .catch(err => console.error('Error al sincronizar las tablas:', err));
+    .catch(err => console.error('Error al conectar a la base de datos:', err));
+
