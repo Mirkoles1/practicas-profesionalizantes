@@ -6,6 +6,17 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 const SECRET = 'tu_secreto_jwt';
 
+// Obtener todos los usuarios
+router.get('/usuarios', async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll();
+    res.json(usuarios);
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    console.error(error); // Esto imprimirá el error detallado en la consola
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Registro de usuario (Sign-up)
 router.post('/register', async (req, res) => {

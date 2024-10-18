@@ -16,17 +16,9 @@ const Proyecto = sequelize.define('Proyecto', {
         allowNull: false,
         defaultValue: 'Activo',
     },
-    fecha_inicio: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
-    fecha_fin: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
 }, {
     tableName: 'proyecto',  // Asegúrate de que coincida con el nombre exacto de la tabla
-    timestamps: true,  // Esto añade createdAt y updatedAt, asegúrate de que estos campos existan en tu tabla
+    timestamps: false,  // Esto asegura que no se añada createdAt y UpdatedAt
 });
 
 module.exports = Proyecto;

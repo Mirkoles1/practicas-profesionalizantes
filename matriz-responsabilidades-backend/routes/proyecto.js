@@ -1,28 +1,71 @@
-// routes/proyectos.js
+// routes/proyecto.js
 const express = require('express');
-const Proyecto = require('../models/Proyecto');
-const Empleado = require('../models/Empleado');
-
+const { Proyecto, Usuario, Invitacion } = require('../models');
+const verificarToken = require('../middleware/authMiddleware');
 const router = express.Router();
 
-// Crear un proyecto con empleados asociados
-router.post('/', async (req, res) => {
+// Crear un proyecto y enviar invitaciones a usuarios
+router.post('/', verificarToken, async (req, res) => {
   try {
-    const { nombre, descripcion, estado, empleados } = req.body;
+    const { nombre, descripcion, estado, usuarios = [] } = req.body;
 
-    // Crea el proyecto
+    // Crear el proyecto
     const proyecto = await Proyecto.create({ nombre, descripcion, estado });
 
-    // Asocia empleados al proyecto (si existen)
-    if (empleados && empleados.length > 0) {
-      const empleadosCreados = await Empleado.bulkCreate(
-        empleados.map(e => ({ ...e, proyectoId: proyecto.id }))
-      );
-      proyecto.empleados = empleadosCreados;
+    // Enviar invitaciones a los usuarios seleccionados
+    const invitaciones = usuarios.map(usuarioId => ({
+      proyectoId: proyecto.id,
+      usuarioId,
+      estado: 'pendiente',
+    }));
+
+    await Invitacion.bulkCreate(invitaciones);
+
+    res.status(201).json(proyecto);
+  } catch (error) {
+    console.error('Error al crear proyecto:', error);
+    console.error(error); // Esto imprimirá el error detallado en la consola
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener todos los proyectos con los usuarios invitados
+router.get('/', verificarToken, async (req, res) => {
+  try {
+    const proyectos = await Proyecto.findAll({
+      include: {
+        model: Usuario,
+        as: 'usuarios',
+        through: { attributes: ['estado'] }, // Incluye el estado de la invitación
+      },
+    });
+    res.json(proyectos);
+  } catch (error) {
+    console.error('Error al obtener proyectos:', error);
+    console.error(error); // Esto imprimirá el error detallado en la consola
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Aceptar o rechazar una invitación
+router.post('/invitacion/:id', verificarToken, async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body; // 'aceptada' o 'rechazada'
+  
+  try {
+    const invitacion = await Invitacion.findByPk(id);
+
+    if (!invitacion) {
+      return res.status(404).json({ error: 'Invitación no encontrada' });
     }
 
-    res.json(proyecto);
+    invitacion.estado = estado;
+    await invitacion.save();
+
+    res.json({ message: `Invitación ${estado}` });
   } catch (error) {
+    console.error('Error al actualizar invitación:', error);
+    console.error(error); // Esto imprimirá el error detallado en la consola
     res.status(500).json({ error: error.message });
   }
 });
