@@ -3,6 +3,7 @@ const cors = require('cors');
 const sequelize = require('./database');  // Conexión a la base de datos
 const Proyecto = require('./models/Proyecto');  // Importa Proyecto (Empleado se importa en él)
 const authRoutes = require('./routes/auth');  // Importa rutas de autenticación
+const proyectoRoutes = require('./routes/proyecto');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // Rutas de autenticación
 app.use('/api/auth', authRoutes);
+app.use('/api/proyectos', proyectoRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

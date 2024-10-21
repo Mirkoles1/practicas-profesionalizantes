@@ -21,6 +21,7 @@ const CrearProyecto = () => {
   const handleCrearProyecto = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
+    console.log('Token enviado:', token);  // Verifica si el token está presente
     try {
       const response = await axios.post(
         'http://localhost:4000/api/proyectos',
@@ -37,9 +38,10 @@ const CrearProyecto = () => {
       console.log('Proyecto:', response.data);
     } catch (error) {
       console.error('Error al crear proyecto:', error);
-      alert('Error al crear proyecto');
+      alert(`Error al crear proyecto: ${error.response?.data?.error || error.message}`);
     }
   };
+  
 
   return (
     <form onSubmit={handleCrearProyecto}>

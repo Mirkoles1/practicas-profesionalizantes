@@ -1,10 +1,13 @@
 // routes/proyecto.js
 const express = require('express');
-const { Proyecto, Usuario, Invitacion } = require('../models');
-const verificarToken = require('../middleware/authMiddleware');
+const verificarToken = require('../middleware/auth');
+const Proyecto = require('../models/Proyecto');  // Importar directamente el modelo Proyecto
+const Invitacion = require('../models/Invitacion');
+const Usuario = require('../models/Usuario');
 const router = express.Router();
 
 // Crear un proyecto y enviar invitaciones a usuarios
+
 router.post('/', verificarToken, async (req, res) => {
   try {
     const { nombre, descripcion, estado, usuarios = [] } = req.body;
@@ -13,21 +16,20 @@ router.post('/', verificarToken, async (req, res) => {
     const proyecto = await Proyecto.create({ nombre, descripcion, estado });
 
     // Enviar invitaciones a los usuarios seleccionados
-    const invitaciones = usuarios.map(usuarioId => ({
-      proyectoId: proyecto.id,
-      usuarioId,
+    const invitaciones = usuarios.map(usuario_id => ({
+      proyecto_id: proyecto.id,
+      usuario_id,
       estado: 'pendiente',
     }));
 
     await Invitacion.bulkCreate(invitaciones);
-
     res.status(201).json(proyecto);
   } catch (error) {
     console.error('Error al crear proyecto:', error);
-    console.error(error); // Esto imprimirá el error detallado en la consola
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Obtener todos los proyectos con los usuarios invitados
 router.get('/', verificarToken, async (req, res) => {

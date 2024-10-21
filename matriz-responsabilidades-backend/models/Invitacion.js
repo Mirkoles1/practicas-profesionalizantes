@@ -4,24 +4,39 @@ const sequelize = require('../database');
 const Usuario = require('./Usuario');
 const Proyecto = require('./Proyecto');
 
-const Invitacion = sequelize.define('Invitacion', {
-  usuarioId: {
+const Invitacion = sequelize.define('invitacion', {
+  // Otros campos...
+  admin_id: {
     type: DataTypes.INTEGER,
-    references: { model: Usuario, key: 'id' },
     allowNull: false,
+    references: {
+      model: 'usuarios', // Nombre de la tabla
+      key: 'id'
+    }
   },
-  proyectoId: {
+  usuario_id: {
     type: DataTypes.INTEGER,
-    references: { model: Proyecto, key: 'id' },
     allowNull: false,
+    references: {
+      model: 'usuarios',
+      key: 'id'
+    }
+  },
+  proyecto_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'proyectos',
+      key: 'id'
+    }
   },
   estado: {
     type: DataTypes.ENUM('pendiente', 'aceptada', 'rechazada'),
-    defaultValue: 'pendiente',
-  },
-}, { tableName: 'invitacion', timestamps: false });
-
-Usuario.belongsToMany(Proyecto, { through: Invitacion, as: 'proyectos' });
-Proyecto.belongsToMany(Usuario, { through: Invitacion, as: 'usuarios' });
+    defaultValue: 'pendiente'
+  }
+}, {
+  tableName: 'invitacion',  // Asegúrate de que coincida con el nombre exacto de la tabla
+  timestamps: false,
+});
 
 module.exports = Invitacion;
