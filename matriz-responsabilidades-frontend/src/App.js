@@ -10,6 +10,7 @@ import ProyectoDetalle from './Components/ProyectoDetalle';
 import LoginForm from './Components/LoginForm';
 import SignUp from './Components/SignUp';
 import CrearProyecto from './Components/CrearProyecto'; // Nueva página para admin
+import './index.css'; // Asegúrate de importar tu CSS aquí
 
 const App = () => {
   const [user, setUser] = useState(null);

@@ -25,11 +25,32 @@ const LoginForm = ({ setUser }) => {
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <input type="text" placeholder="Usuario" value={username} onChange={(e) => setUsername(e.target.value)} required />
-      <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      <button type="submit">Iniciar Sesión</button>
-    </form>
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 className="text-xl font-semibold mb-6 text-center">Iniciar Sesión</h2>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input 
+            type="text" 
+            placeholder="Usuario" 
+            value={username} 
+            onChange={(e) => setUsername(e.target.value)} 
+            required 
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
+          />
+          <input 
+            type="password" 
+            placeholder="Contraseña" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
+          />
+          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
+            Iniciar Sesión
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 
