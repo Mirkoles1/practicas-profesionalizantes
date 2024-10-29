@@ -8,8 +8,10 @@ const Navbar = ({ user, onLogout }) => (
       <li><Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Inicio</Link></li>
       <li><Link to="/proyectos" style={{ color: 'white', textDecoration: 'none' }}>Proyectos</Link></li>
 
-      {user?.rol === 'admin' && (
-        <li><Link to="/crear-proyecto" style={{ color: 'white', textDecoration: 'none' }}>Crear Proyecto</Link></li>
+      {user?.rol === 'Administrador' && (
+        <>
+          <li><Link to="/matriz" style={{ color: 'white', textDecoration: 'none' }}>Matriz</Link></li>
+        </>
       )}
 
       {!user && (

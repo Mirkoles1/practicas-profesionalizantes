@@ -4,13 +4,16 @@ const express = require('express');
 const app = express();
 const sequelize = require('./database'); // Conexión a la base de datos
 const PORT = process.env.PORT || 4000;
+const cors = require('cors');
 
 // Middlewares de terceros
 app.use(express.json());
 
+app.use(cors());
+
 // Importar modelos para definir relaciones
 const Usuario = require('./models/Usuario');
-const Empleado = require('./models/empleado');
+const Empleado = require('./models/Empleado');
 const Proyecto = require('./models/Proyecto');
 const Actividad = require('./models/Actividad');
 const Asignacion = require('./models/Asignacion');
@@ -39,7 +42,7 @@ const asignacionRoutes = require('./routes/asignacionRoutes');
 const empleadoRoutes = require('./routes/empleadoRoutes');
 
 // Rutas para los modelos
-app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/auth', usuarioRoutes);
 app.use('/api/proyectos', authenticate, proyectoRoutes);
 app.use('/api/actividades', authenticate, actividadRoutes);
 app.use('/api/asignaciones', authenticate, asignacionRoutes);

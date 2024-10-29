@@ -1,5 +1,5 @@
 // controllers/empleadoController.js
-const Empleado = require('../models/empleado');
+const Empleado = require('../models/Empleado');
 
 exports.createEmpleado = async (req, res) => {
     try {

@@ -1,9 +1,15 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../database'); // Asegúrate de que la conexión sea correcta
+// models/Usuario.js
 
-// Definir el modelo Usuario, sincronizando con la tabla existente
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database');
+
 const Usuario = sequelize.define('Usuario', {
-    username: {
+    id_usuario: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    nombre_usuario: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
@@ -22,8 +28,8 @@ const Usuario = sequelize.define('Usuario', {
         allowNull: false,
     },
 }, {
-    tableName: 'usuario',  // Asegúrate de que coincida con el nombre exacto de la tabla
-    timestamps: false, // Desactiva los campos createdAt y updatedAt
+    tableName: 'usuario', // Asegúrate de que coincide con el nombre exacto de la tabla
+    timestamps: false,
 });
 
 module.exports = Usuario;

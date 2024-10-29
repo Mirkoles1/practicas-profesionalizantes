@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');  // Asegúrate de que la conexión sea correcta
-const Actividad = require('./actividad');  // Importar el modelo Actividad
-const Empleado = require('./empleado');    // Importar el modelo Empleado
+const Actividad = require('./Actividad');  // Importar el modelo Actividad
+const Empleado = require('./Empleado');    // Importar el modelo Empleado
 
 // Definir el modelo Asignación
 const Asignacion = sequelize.define('Asignacion', {

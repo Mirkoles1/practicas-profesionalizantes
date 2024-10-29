@@ -7,18 +7,20 @@ const Dashboard = ({ user }) => {
   const [proyectos, setProyectos] = useState([]);
   const navigate = useNavigate();
 
+  // Dashboard.js - Ejemplo de configuración del token
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:4000/api/proyectos', {
-      headers: { Authorization: token }
+        headers: { Authorization: `Bearer ${token}` } // Incluye "Bearer "
     })
-      .then(response => setProyectos(response.data))
-      .catch(error => console.error('Error al obtener proyectos:', error));
+    .then(response => setProyectos(response.data))
+    .catch(error => console.error('Error al obtener proyectos:', error));
   }, []);
+
 
   return (
     <div>
-      <h1>Bienvenido, {user?.username}</h1>
+      <h1>Bienvenido, {user?.nombre_usuario}</h1>
       {user?.rol === 'admin' && <p>Eres administrador.</p>}
       <ul>
         {proyectos.map(proyecto => (

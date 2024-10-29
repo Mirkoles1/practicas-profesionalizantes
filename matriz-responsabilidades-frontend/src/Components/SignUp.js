@@ -1,75 +1,95 @@
-// Components/SignUp.js
+// src/components/SignUp.js
+
 import React, { useState } from 'react';
 import axios from 'axios';
+import {
+    TextField,
+    Button,
+    Container,
+    Box,
+    Typography,
+    Paper,
+} from '@mui/material';
 
 const SignUp = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rol, setRol] = useState('empleado');
+  const [nombre_usuario, setNombreUsuario] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post('http://localhost:4000/api/auth/register', {
-        username,
-        email,
-        password,
-        rol,
-      });
-      alert('Registro exitoso');
-    } catch (error) {
-      alert('Error al registrar usuario');
-    }
-  };
+    // El rol se establece directamente a "admin"
+    const rol = 'admin';
 
-  return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-xl font-semibold mb-6 text-center">Registrarse</h2>
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <input 
-            type="text" 
-            value={username} 
-            onChange={e => setUsername(e.target.value)} 
-            placeholder="Usuario" 
-            required 
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
-          />
-          <input 
-            type="email" 
-            value={email} 
-            onChange={e => setEmail(e.target.value)} 
-            placeholder="Correo Electrónico" 
-            required 
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
-          />
-          <input 
-            type="password" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            placeholder="Contraseña" 
-            required 
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
-          />
-          <select 
-            value={rol} 
-            onChange={e => setRol(e.target.value)} 
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400"
-          >
-            <option value="empleado">Empleado</option>
-            <option value="admin">Administrador</option>
-          </select>
-          <button 
-            type="submit" 
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-          >
-            Registrarse
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
+                nombre_usuario,
+                email,
+                password,
+                rol,  // Rol fijo como "admin"
+            });
+            alert('Registro exitoso');
+        } catch (error) {
+          const errorMessage = error.response?.data?.error || error.message || 'Error';
+          alert(`Error: ${errorMessage}`);
+        }
+    };
+
+    return (
+        <Container
+            maxWidth="sm"
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '100vh',
+                backgroundColor: '#f5f5f5',
+            }}
+        >
+            <Paper elevation={3} sx={{ padding: 4, width: '100%', maxWidth: 400 }}>
+                <Typography variant="h5" component="h2" align="center" gutterBottom>
+                    Registrarse como Administrador
+                </Typography>
+                <Box component="form" onSubmit={handleSignUp} noValidate sx={{ mt: 3 }}>
+                    <TextField
+                        fullWidth
+                        label="Usuario"
+                        value={nombre_usuario}
+                        onChange={(e) => setNombreUsuario(e.target.value)}
+                        margin="normal"
+                        required
+                    />
+                    <TextField
+                        fullWidth
+                        label="Correo Electrónico"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        margin="normal"
+                        required
+                    />
+                    <TextField
+                        fullWidth
+                        label="Contraseña"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        margin="normal"
+                        required
+                    />
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                    >
+                        Registrarse
+                    </Button>
+                </Box>
+            </Paper>
+        </Container>
+    );
 };
 
 export default SignUp;

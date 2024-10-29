@@ -56,3 +56,21 @@ exports.deleteProyecto = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.getMatrizResponsabilidades = async (req, res) => {
+    try {   
+        const proyectos = await Proyecto.findAll({
+            where: { id_usuario: req.user.id }, // Filtra proyectos por usuario
+            include: [
+                {
+                    model: Actividad,
+                    attributes: ['id_actividad', 'nombre_actividad', 'descripcion']
+                }
+            ]
+        });
+        res.json(proyectos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener la matriz de responsabilidades' });
+    }
+};
