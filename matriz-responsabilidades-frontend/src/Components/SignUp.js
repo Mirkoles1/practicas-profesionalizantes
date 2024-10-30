@@ -17,7 +17,7 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
 
     // El rol se establece directamente a "admin"
-    const rol = 'admin';
+    const rol = 'Administrador';
 
     const handleSignUp = async (e) => {
         e.preventDefault();

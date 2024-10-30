@@ -1,74 +1,75 @@
-// src/components/ResponsibilityMatrix.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { 
-    Card, 
-    CardHeader, 
-    CardContent, 
-    Button, 
-    TextField, 
-    Typography, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableContainer, 
-    TableRow, 
-    Paper 
+import {
+    Card, CardHeader, CardContent, Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText,
+    DialogTitle, TextField, Snackbar, Alert, Grid
 } from '@mui/material';
 
 const ResponsibilityMatrix = () => {
     const [projects, setProjects] = useState([]);
-    const [newProject, setNewProject] = useState({ nombre_proyecto: '', descripcion: '' });
     const [newActivity, setNewActivity] = useState({ nombre_actividad: '', descripcion: '', id_proyecto: '' });
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
 
     useEffect(() => {
         loadProjects();
     }, []);
 
+    // Función para cargar proyectos
     const loadProjects = async () => {
         try {
-            const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/proyectos`);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('Token de autorización no encontrado. Por favor, inicia sesión nuevamente.');
+                return;
+            }
+            const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/proyectos`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setProjects(data);
         } catch (error) {
-            alert(`Error al cargar proyectos: ${error.message}`);
+            const errorMessage = error.response?.status === 401 
+                ? 'No autorizado. Por favor, verifica tus credenciales.' 
+                : `Error al cargar proyectos: ${error.message}`;
+            setError(errorMessage);
         }
     };
 
-    const handleAddProject = async () => {
-        try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/proyectos`, newProject);
-            setNewProject({ nombre_proyecto: '', descripcion: '' });
-            loadProjects();
-        } catch (error) {
-            alert(`Error al agregar proyecto: ${error.message}`);
-        }
+    // Función para manejar la apertura del diálogo para agregar actividad
+    const handleOpenDialog = (projectId) => {
+        setSelectedProjectId(projectId);
+        setDialogOpen(true);
     };
 
+    // Función para cerrar el diálogo
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+        setNewActivity({ nombre_actividad: '', descripcion: '', id_proyecto: '' });
+    };
+
+    // Función para agregar una nueva actividad
     const handleAddActivity = async () => {
         try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/actividades`, newActivity);
-            setNewActivity({ nombre_actividad: '', descripcion: '', id_proyecto: '' });
-            loadProjects();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('Token de autorización no encontrado. Por favor, inicia sesión nuevamente.');
+                return;
+            }
+            await axios.post(
+                `${process.env.REACT_APP_API_URL}/actividades`,
+                { ...newActivity, id_proyecto: selectedProjectId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setSuccess('Actividad agregada exitosamente');
+            handleCloseDialog();
+            loadProjects(); // Opcional, si deseas actualizar la lista de actividades en cada proyecto
         } catch (error) {
-            alert(`Error al agregar actividad: ${error.message}`);
-        }
-    };
-
-    const handleDeleteProject = async (projectId) => {
-        try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/proyectos/${projectId}`);
-            loadProjects();
-        } catch (error) {
-            alert(`Error al eliminar proyecto: ${error.message}`);
-        }
-    };
-
-    const handleDeleteActivity = async (activityId) => {
-        try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/actividades/${activityId}`);
-            loadProjects();
-        } catch (error) {
-            alert(`Error al eliminar actividad: ${error.message}`);
+            const errorMessage = error.response?.status === 401 
+                ? 'No autorizado para agregar actividad.' 
+                : `Error al agregar actividad: ${error.message}`;
+            setError(errorMessage);
         }
     };
 
@@ -77,115 +78,72 @@ const ResponsibilityMatrix = () => {
             <Typography variant="h3" gutterBottom>
                 Matriz de Responsabilidades
             </Typography>
-
-            <Card style={{ marginBottom: '20px', padding: '16px' }}>
-                <CardHeader title="Agregar Proyecto" />
-                <CardContent>
+            <Grid container spacing={2}>
+                {projects.map(project => (
+                    <Grid item xs={12} key={project.id_proyecto}>
+                        <Card style={{ padding: '16px', backgroundColor: '#fff' }}>
+                            <CardHeader title={project.nombre_proyecto} />
+                            <CardContent>
+                                <Typography variant="body1" gutterBottom>
+                                    {project.descripcion}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Fecha de Inicio: {project.fecha_inicio || 'N/A'}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Fecha de Fin: {project.fecha_fin || 'N/A'}
+                                </Typography>
+                                <Button 
+                                    variant="outlined" 
+                                    color="primary" 
+                                    style={{ marginTop: '10px' }} 
+                                    onClick={() => handleOpenDialog(project.id_proyecto)}
+                                >
+                                    Crear Actividad
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+            <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>Agregar Nueva Actividad</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Llena los detalles de la nueva actividad para el proyecto.
+                    </DialogContentText>
                     <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Nombre de la Actividad"
                         fullWidth
-                        label="Nombre del Proyecto"
-                        value={newProject.nombre_proyecto}
-                        onChange={(e) => setNewProject({ ...newProject, nombre_proyecto: e.target.value })}
-                        margin="normal"
+                        value={newActivity.nombre_actividad}
+                        onChange={(e) => setNewActivity({ ...newActivity, nombre_actividad: e.target.value })}
                     />
                     <TextField
-                        fullWidth
+                        margin="dense"
                         label="Descripción"
-                        multiline
-                        rows={4}
-                        value={newProject.descripcion}
-                        onChange={(e) => setNewProject({ ...newProject, descripcion: e.target.value })}
-                        margin="normal"
-                    />
-                    <Button 
-                        onClick={handleAddProject} 
-                        variant="contained" 
-                        color="primary" 
                         fullWidth
-                        style={{ marginTop: '10px' }}
-                    >
-                        Agregar Proyecto
+                        multiline
+                        rows={3}
+                        value={newActivity.descripcion}
+                        onChange={(e) => setNewActivity({ ...newActivity, descripcion: e.target.value })}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="secondary">
+                        Cancelar
                     </Button>
-                </CardContent>
-            </Card>
-
-            {projects.map((project) => (
-                <Card key={project.id_proyecto} style={{ marginBottom: '20px', padding: '16px' }}>
-                    <CardHeader title={project.nombre_proyecto} />
-                    <CardContent>
-                        <Typography variant="body1" paragraph>
-                            {project.descripcion}
-                        </Typography>
-                        <Button 
-                            onClick={() => handleDeleteProject(project.id_proyecto)} 
-                            variant="contained" 
-                            color="error"
-                        >
-                            Eliminar Proyecto
-                        </Button>
-
-                        <Typography variant="h6" style={{ marginTop: '20px' }}>
-                            Actividades
-                        </Typography>
-                        <TableContainer component={Paper}>
-                            <Table>
-                                <TableBody>
-                                    {project.actividades?.map((activity) => (
-                                        <TableRow key={activity.id_actividad}>
-                                            <TableCell>{activity.nombre_actividad}</TableCell>
-                                            <TableCell>{activity.descripcion}</TableCell>
-                                            <TableCell>
-                                                <Button 
-                                                    variant="contained" 
-                                                    color="error" 
-                                                    onClick={() => handleDeleteActivity(activity.id_actividad)}
-                                                >
-                                                    Eliminar Actividad
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-
-                        <div style={{ marginTop: '20px' }}>
-                            <TextField
-                                fullWidth
-                                label="Nombre de la Actividad"
-                                value={newActivity.nombre_actividad}
-                                onChange={(e) => setNewActivity({ 
-                                    ...newActivity, 
-                                    nombre_actividad: e.target.value, 
-                                    id_proyecto: project.id_proyecto 
-                                })}
-                                margin="normal"
-                            />
-                            <TextField
-                                fullWidth
-                                label="Descripción"
-                                multiline
-                                rows={4}
-                                value={newActivity.descripcion}
-                                onChange={(e) => setNewActivity({ 
-                                    ...newActivity, 
-                                    descripcion: e.target.value 
-                                })}
-                                margin="normal"
-                            />
-                            <Button 
-                                onClick={handleAddActivity} 
-                                variant="contained" 
-                                color="primary" 
-                                fullWidth
-                                style={{ marginTop: '10px' }}
-                            >
-                                Agregar Actividad
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
+                    <Button onClick={handleAddActivity} color="primary">
+                        Agregar Actividad
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Snackbar open={!!success || !!error} autoHideDuration={6000} onClose={() => { setSuccess(null); setError(null); }}>
+                <Alert onClose={() => { setSuccess(null); setError(null); }} severity={success ? "success" : "error"}>
+                    {success || error}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

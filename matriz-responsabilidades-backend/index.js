@@ -13,18 +13,19 @@ app.use(cors());
 
 // Importar modelos para definir relaciones
 const Usuario = require('./models/Usuario');
-const Empleado = require('./models/Empleado');
 const Proyecto = require('./models/Proyecto');
 const Actividad = require('./models/Actividad');
 const Asignacion = require('./models/Asignacion');
+const UsuarioProyecto = require('./models/UsuarioProyecto');
 
 // Definir relaciones entre modelos
-Proyecto.belongsTo(Usuario, { foreignKey: 'id_usuario' });
 Asignacion.belongsTo(Actividad, { foreignKey: 'id_actividad' });
-Asignacion.belongsTo(Empleado, { foreignKey: 'id_empleado' });
-Empleado.belongsTo(Usuario, { foreignKey: 'id_usuario' });
-Actividad.hasMany(Asignacion, { foreignKey: 'id_actividad' });
-Empleado.hasMany(Asignacion, { foreignKey: 'id_empleado' });
+Asignacion.belongsTo(Usuario, { foreignKey: 'id_usuario' });
+UsuarioProyecto.belongsTo(Usuario, { foreignKey: 'id_usuario', onDelete: 'CASCADE' });
+UsuarioProyecto.belongsTo(Proyecto, { foreignKey: 'id_proyecto', onDelete: 'CASCADE' });
+Usuario.hasMany(Asignacion, { foreignKey: 'id_usuario', onDelete: 'CASCADE' });
+Proyecto.hasMany(Actividad, { foreignKey: 'id_proyecto', onDelete: 'CASCADE' });
+Actividad.belongsTo(Proyecto, { foreignKey: 'id_proyecto', onDelete: 'CASCADE' });
 
 // Sincronizar modelos con la base de datos
 sequelize.sync()
@@ -39,14 +40,14 @@ const usuarioRoutes = require('./routes/usuarioRoutes');
 const proyectoRoutes = require('./routes/proyectoRoutes');
 const actividadRoutes = require('./routes/actividadRoutes');
 const asignacionRoutes = require('./routes/asignacionRoutes');
-const empleadoRoutes = require('./routes/empleadoRoutes');
+const usuarioProyectoRoutes = require('./routes/usuarioProyectoRoutes');
 
 // Rutas para los modelos
 app.use('/api/auth', usuarioRoutes);
 app.use('/api/proyectos', authenticate, proyectoRoutes);
 app.use('/api/actividades', authenticate, actividadRoutes);
 app.use('/api/asignaciones', authenticate, asignacionRoutes);
-app.use('/api/empleados', empleadoRoutes); 
+app.use('/api/usuario_proyecto', usuarioProyectoRoutes);
 
 // Ruta para verificar permisos de administrador
 app.use('/api/admin', authenticate, isAdmin, (req, res) => {

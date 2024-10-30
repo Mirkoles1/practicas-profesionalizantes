@@ -3,9 +3,9 @@ const Proyecto = require('../models/Proyecto');
 
 // Crear un nuevo proyecto
 exports.createProyecto = async (req, res) => {
-    const { nombre_proyecto, descripcion } = req.body;
+    const { nombre_proyecto, descripcion, fecha_inicio, fecha_fin, id_usuario } = req.body;
     try {
-        const nuevoProyecto = await Proyecto.create({ nombre_proyecto, descripcion });
+        const nuevoProyecto = await Proyecto.create({ nombre_proyecto, descripcion, fecha_inicio, fecha_fin, id_usuario });
         res.status(201).json(nuevoProyecto);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -26,9 +26,8 @@ exports.getProyectosAdmin = async (req, res) => {
 exports.getProyectosEmpleado = async (req, res) => {
     const empleadoId = req.params.id;
     try {
-        // Aquí implementa la lógica para obtener proyectos según el empleado
-        // Por ejemplo, podrías tener una relación de muchos a muchos entre empleados y proyectos
-        res.json([]); // Reemplazar con la lógica real
+        const proyectos = await Proyecto.findAll({ where: { id_usuario: empleadoId } });
+        res.json(proyectos);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -37,9 +36,9 @@ exports.getProyectosEmpleado = async (req, res) => {
 // Actualizar un proyecto
 exports.updateProyecto = async (req, res) => {
     const { id } = req.params;
-    const { nombre_proyecto, descripcion } = req.body;
+    const { nombre_proyecto, descripcion, fecha_inicio, fecha_fin, id_usuario } = req.body;
     try {
-        await Proyecto.update({ nombre_proyecto, descripcion }, { where: { id_proyecto: id } });
+        await Proyecto.update({ nombre_proyecto, descripcion, fecha_inicio, fecha_fin, id_usuario }, { where: { id_proyecto: id } });
         res.json({ message: 'Proyecto actualizado' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -57,16 +56,17 @@ exports.deleteProyecto = async (req, res) => {
     }
 };
 
+// Obtener matriz de responsabilidades
 exports.getMatrizResponsabilidades = async (req, res) => {
-    try {   
+    try {
         const proyectos = await Proyecto.findAll({
-            where: { id_usuario: req.user.id }, // Filtra proyectos por usuario
+            where: { id_usuario: req.user.id },
             include: [
                 {
                     model: Actividad,
-                    attributes: ['id_actividad', 'nombre_actividad', 'descripcion']
-                }
-            ]
+                    attributes: ['id_actividad', 'nombre_actividad', 'descripcion'],
+                },
+            ],
         });
         res.json(proyectos);
     } catch (error) {

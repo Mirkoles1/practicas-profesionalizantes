@@ -7,7 +7,7 @@ const asignacionController = require('../controllers/asignacionController');
 router.post('/', asignacionController.createAsignacion);
 
 // Obtener todas las asignaciones de un empleado
-router.get('/empleado/:id', asignacionController.getAsignacionesPorEmpleado);
+router.get('/usuario/:id', asignacionController.getAsignacionesPorEmpleado);
 
 // Actualizar una asignación
 router.put('/:id', asignacionController.updateAsignacion);

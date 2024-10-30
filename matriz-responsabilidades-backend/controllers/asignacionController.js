@@ -1,7 +1,6 @@
 // controllers/asignacionController.js
 const Asignacion = require('../models/Asignacion');
 const Actividad = require('../models/Actividad');
-const Empleado = require('../models/Empleado');
 
 // Crear una nueva asignación
 exports.createAsignacion = async (req, res) => {
