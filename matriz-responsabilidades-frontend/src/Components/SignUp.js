@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 const SignUp = () => {
-  const [nombre_usuario, setNombreUsuario] = useState('');
+    const [nombre_usuario, setNombreUsuario] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 

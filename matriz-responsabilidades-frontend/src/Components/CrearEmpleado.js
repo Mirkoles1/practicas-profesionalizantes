@@ -37,14 +37,14 @@ const CrearEmpleado = () => {
         try {
             const token = localStorage.getItem('token'); // Obtener el token de autorización
             await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/auth/registerEmpleado`, 
+                `${process.env.REACT_APP_API_URL}/auth/registerEmpleado`, 
                 empleado, 
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
             setSuccess('Empleado creado exitosamente');
-            setTimeout(() => navigate('/empleados'), 1500); // Redirigir tras éxito
+            // setTimeout(() => navigate('/empleados'), 1500); // Redirigir tras éxito
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'Error al crear el empleado';
             alert(`Error: ${errorMessage}`); // Mostrar error en una alerta

@@ -64,15 +64,23 @@ const Navbar = ({ user, onLogout }) => {
                             >
                                 <AccountCircle />
                             </IconButton>
+                            {/* Menú desplegable */}
                             <Menu
                                 anchorEl={anchorEl}
                                 open={Boolean(anchorEl)}
                                 onClose={handleMenuClose}
-                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                             >
-                                <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
-                                <MenuItem onClick={onLogout}>Cerrar sesión</MenuItem>
+                                <MenuItem onClick={handleMenuClose} component={Link} to="/perfil">
+                                    Perfil
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() => {
+                                        handleMenuClose();
+                                        onLogout();
+                                    }}
+                                >
+                                    Cerrar sesión
+                                </MenuItem>
                             </Menu>
                         </>
                     )}

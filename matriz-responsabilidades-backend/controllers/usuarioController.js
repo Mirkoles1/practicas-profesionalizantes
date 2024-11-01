@@ -18,7 +18,7 @@ exports.registerEmpleado = async (req, res) => {
         res.status(201).json(newUser);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error al crear el empleado' });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -60,3 +60,65 @@ exports.login = async (req, res) => {
     }
 };
 
+// Actualizar datos de usuario
+exports.updateUsuario = async (req, res) => {
+    const { nombre_usuario, email, password } = req.body;
+    const id_usuario = req.user.id_usuario; // ID del usuario desde el token
+
+    try {
+        // Si hay contraseña, cifrarla
+        let hashedPassword;
+        if (password) {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
+
+        // Actualizar usuario en la base de datos
+        await Usuario.update(
+            {
+                nombre_usuario: nombre_usuario || req.user.nombre_usuario,
+                email: email || req.user.email,
+                password: hashedPassword || req.user.password
+            },
+            { where: { id_usuario } }
+        );
+        
+        res.status(200).json({ message: 'Usuario actualizado exitosamente' });
+    } catch (error) {
+        console.error("Error al actualizar usuario:", error);
+        res.status(500).json({ error: 'Error al actualizar usuario' });
+    }
+};
+
+// Eliminar cuenta de usuario
+exports.deleteUsuario = async (req, res) => {
+    const id_usuario = req.user.id_usuario; // ID del usuario desde el token
+
+    try {
+        await Usuario.destroy({ where: { id_usuario } });
+        res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+    } catch (error) {
+        console.error("Error al eliminar usuario:", error);
+        res.status(500).json({ error: 'Error al eliminar usuario' });
+    }
+};
+
+// Obtener datos del usuario
+exports.getUsuario = async (req, res) => {
+    const id_usuario = req.user.id_usuario; // Se obtiene del token
+
+    try {
+        const usuario = await Usuario.findOne({
+            where: { id_usuario },
+            attributes: ['id_usuario', 'nombre_usuario', 'email'] // Solo devolver los campos necesarios
+        });
+        
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.json(usuario);
+    } catch (error) {
+        console.error("Error al obtener los datos del usuario:", error);
+        res.status(500).json({ error: 'Error al obtener los datos del usuario' });
+    }
+};

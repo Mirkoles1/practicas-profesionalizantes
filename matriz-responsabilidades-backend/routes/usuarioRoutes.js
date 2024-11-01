@@ -13,4 +13,13 @@ router.post('/login', usuarioController.login);
 // Registro de usuario con rol predeterminado "Empleado"
 router.post('/registerEmpleado', authenticate, usuarioController.registerEmpleado);
 
+// Actualizar datos del usuario
+router.put('/update', authenticate, usuarioController.updateUsuario);
+
+// Eliminar cuenta de usuario
+router.delete('/delete', authenticate, usuarioController.deleteUsuario);
+
+// Obtener datos del usuario actual
+router.get('/user', authenticate, usuarioController.getUsuario);
+
 module.exports = router;

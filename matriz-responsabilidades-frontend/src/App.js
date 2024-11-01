@@ -13,6 +13,7 @@ import SignUp from './Components/SignUp';
 import ResponsibilityMatrix from './Components/ResponsibilityMatrix';
 import CrearEmpleado from './Components/CrearEmpleado';
 import CrearProyecto from './Components/CrearProyecto';
+import Perfil from './Components/Perfil';
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -51,6 +52,8 @@ const App = () => {
                     />
                     <Route path="/matriz" element={<ResponsibilityMatrix />} />
                     <Route path="/login" element={user ? <Navigate to="/" /> : <LoginForm setUser={setUser} />} />
+                    <Route 
+                        path="/perfil" element={<Perfil />}/>
                     <Route path="/signup" element={<SignUp />} />
                 </Routes>
             </div>
