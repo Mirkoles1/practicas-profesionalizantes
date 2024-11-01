@@ -1,4 +1,4 @@
-// src/Components/CrearEmpleado.js
+// src/Components/CrearProyecto.js
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,40 +14,40 @@ import {
     Alert 
 } from '@mui/material';
 
-const CrearEmpleado = () => {
-    const [empleado, setEmpleado] = useState({
-        nombre_usuario: '',
-        email: '',
-        password: '',
-        rol: 'Empleado' // Asignación por defecto del rol
+const CrearProyecto = () => {
+    const [proyecto, setProyecto] = useState({
+        nombre_proyecto: '',
+        descripcion: '',
+        fecha_inicio: '',
+        fecha_fin: ''
     });
 
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const navigate = useNavigate();
 
-    // Manejar los cambios en los campos del formulario
+    // Manejar el cambio en los campos del formulario
     const handleChange = (e) => {
-        setEmpleado({ ...empleado, [e.target.name]: e.target.value });
+        setProyecto({ ...proyecto, [e.target.name]: e.target.value });
     };
 
     // Manejar el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token'); // Obtener el token de autorización
+            const token = localStorage.getItem('token'); // Obtén el token de autorización
             await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/auth/registerEmpleado`, 
-                empleado, 
+                `${process.env.REACT_APP_API_URL}/proyectos`,
+                proyecto,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            setSuccess('Empleado creado exitosamente');
-            setTimeout(() => navigate('/empleados'), 1500); // Redirigir tras éxito
+            setSuccess('Proyecto creado exitosamente');
+            setTimeout(() => navigate('/proyectos'), 1500); // Redirigir tras éxito
         } catch (error) {
-            const errorMessage = error.response?.data?.error || 'Error al crear el empleado';
-            alert(`Error: ${errorMessage}`); // Mostrar error en una alerta
+            const errorMessage = error.response?.data?.error || 'Error al crear el proyecto';
+            setError(errorMessage);
         }
     };
 
@@ -55,37 +55,47 @@ const CrearEmpleado = () => {
         <Container maxWidth="sm" sx={{ mt: 5 }}>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h5" align="center" gutterBottom>
-                    Crear Nuevo Empleado
+                    Crear Nuevo Proyecto
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
                     <TextField
-                        label="Nombre de Usuario"
-                        name="nombre_usuario"
-                        value={empleado.nombre_usuario}
+                        label="Nombre del Proyecto"
+                        name="nombre_proyecto"
+                        value={proyecto.nombre_proyecto}
                         onChange={handleChange}
                         fullWidth
                         required
                         margin="normal"
                     />
                     <TextField
-                        label="Correo Electrónico"
-                        name="email"
-                        type="email"
-                        value={empleado.email}
+                        label="Descripción"
+                        name="descripcion"
+                        value={proyecto.descripcion}
                         onChange={handleChange}
                         fullWidth
-                        required
+                        multiline
+                        rows={3}
                         margin="normal"
                     />
                     <TextField
-                        label="Contraseña"
-                        name="password"
-                        type="password"
-                        value={empleado.password}
+                        label="Fecha de Inicio"
+                        name="fecha_inicio"
+                        type="date"
+                        value={proyecto.fecha_inicio}
                         onChange={handleChange}
                         fullWidth
-                        required
                         margin="normal"
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                        label="Fecha de Fin"
+                        name="fecha_fin"
+                        type="date"
+                        value={proyecto.fecha_fin}
+                        onChange={handleChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{ shrink: true }}
                     />
                     <Button 
                         type="submit" 
@@ -94,7 +104,7 @@ const CrearEmpleado = () => {
                         fullWidth 
                         sx={{ mt: 2 }}
                     >
-                        Crear Empleado
+                        Crear Proyecto
                     </Button>
                 </Box>
             </Paper>
@@ -116,4 +126,4 @@ const CrearEmpleado = () => {
     );
 };
 
-export default CrearEmpleado;
+export default CrearProyecto;

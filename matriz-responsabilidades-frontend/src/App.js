@@ -11,7 +11,8 @@ import ProyectoDetalle from './Components/ProyectoDetalle';
 import LoginForm from './Components/LoginForm';
 import SignUp from './Components/SignUp';
 import ResponsibilityMatrix from './Components/ResponsibilityMatrix';
-import CrearEmpleado from './Components/CrearEmpleado';  // <--- Importamos el componente
+import CrearEmpleado from './Components/CrearEmpleado';
+import CrearProyecto from './Components/CrearProyecto';
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -43,6 +44,7 @@ const App = () => {
                     <Route path="/" element={<Dashboard user={user} />} />
                     <Route path="/proyectos" element={<ProyectoList />} />
                     <Route path="/proyectos/:id" element={<ProyectoDetalle />} />
+                    <Route path="/crear-proyecto" element={<CrearProyecto />} />
                     <Route 
                         path="/crear-empleado" 
                         element={<ProtectedRoute element={<CrearEmpleado />} roles={['Administrador']} />} 

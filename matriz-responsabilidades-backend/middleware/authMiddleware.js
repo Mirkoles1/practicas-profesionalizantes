@@ -4,22 +4,22 @@ const SECRET = process.env.JWT_SECRET;
 
 // Middleware para verificar el token
 const authenticate = (req, res, next) => {
-    const token = req.headers['authorization'];
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      return res.status(403).json({ error: 'No se proporcionó un token' });
+    }
+  
+    const token = authHeader.split(' ')[1];
     if (!token) {
-        return res.status(403).json({ error: 'No se proporcionó un token' });
+      return res.status(403).json({ error: 'Token inválido' });
     }
-
-    const tokenParts = token.split(" ");
-    if (tokenParts[0] !== 'Bearer' || !tokenParts[1]) {
-        return res.status(403).json({ error: 'Formato de token inválido' });
-    }
-
-    jwt.verify(tokenParts[1], SECRET, (err, decoded) => {
-        if (err) return res.status(401).json({ error: 'Token no válido' });
-        req.user = decoded; // Asigna datos del token a `req.user`
-        next();
+  
+    jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) return res.status(401).json({ error: 'Token no válido' });
+      req.user = decoded;  // Aquí se debería adjuntar correctamente el `id_usuario`
+      next();
     });
-};
+  };
 
 // Middleware para verificar el rol de administrador
 const isAdmin = (req, res, next) => {

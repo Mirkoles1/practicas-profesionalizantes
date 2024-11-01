@@ -21,11 +21,11 @@ const UsuarioProyecto = require('./models/UsuarioProyecto');
 // Definir relaciones entre modelos
 Asignacion.belongsTo(Actividad, { foreignKey: 'id_actividad' });
 Asignacion.belongsTo(Usuario, { foreignKey: 'id_usuario' });
-UsuarioProyecto.belongsTo(Usuario, { foreignKey: 'id_usuario', onDelete: 'CASCADE' });
-UsuarioProyecto.belongsTo(Proyecto, { foreignKey: 'id_proyecto', onDelete: 'CASCADE' });
-Usuario.hasMany(Asignacion, { foreignKey: 'id_usuario', onDelete: 'CASCADE' });
-Proyecto.hasMany(Actividad, { foreignKey: 'id_proyecto', onDelete: 'CASCADE' });
 Actividad.belongsTo(Proyecto, { foreignKey: 'id_proyecto', onDelete: 'CASCADE' });
+Proyecto.hasMany(UsuarioProyecto, { foreignKey: 'id_proyecto' });
+UsuarioProyecto.belongsTo(Proyecto, { foreignKey: 'id_proyecto' });
+UsuarioProyecto.belongsTo(Usuario, { foreignKey: 'id_usuario' });
+Usuario.hasMany(UsuarioProyecto, { foreignKey: 'id_usuario' })
 
 // Sincronizar modelos con la base de datos
 sequelize.sync()

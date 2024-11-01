@@ -9,7 +9,7 @@ router.post('/', authenticate, isAdmin, proyectoController.createProyecto);
 // Obtener todos los proyectos (solo para administradores)
 router.get('/', authenticate, isAdmin, proyectoController.getProyectosAdmin);
 // Obtener proyectos específicos para un empleado
-router.get('/empleado/:id', authenticate, proyectoController.getProyectosEmpleado);
+router.get('/usuario/:id', authenticate, proyectoController.getProyectosUsuario);
 // Actualizar un proyecto
 router.put('/:id', authenticate, proyectoController.updateProyecto);
 // Eliminar un proyecto
