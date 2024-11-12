@@ -89,6 +89,7 @@ const ResponsibilityMatrix = () => {
             loadProjects(); // Recargar proyectos para actualizar actividades
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'Error al agregar la actividad.';
+            console.log(errorMessage);
             setError(errorMessage);
         }
     };
