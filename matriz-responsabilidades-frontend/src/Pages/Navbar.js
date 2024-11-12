@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-// Components/Navbar.js
-import React from 'react';
-=======
 // Navbar.js
 
 import React, { useState } from 'react';
->>>>>>> Frontend
 import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,18 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 
-<<<<<<< HEAD
-const Navbar = () => (
-  <nav style={{ backgroundColor: '#222', padding: '10px' }}>
-    <ul style={{ display: 'flex', listStyle: 'none', justifyContent: 'space-around', margin: 0 }}>
-      <li><Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Inicio</Link></li>
-      <li><Link to="/proyectos" style={{ color: 'white', textDecoration: 'none' }}>Proyectos</Link></li>
-      <li><Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>Login</Link></li>
-      <li><Link to="/SignUp" style={{ color: 'white', textDecoration: 'none' }}>SignUp</Link></li>
-    </ul>
-  </nav>
-);
-=======
+
 const Navbar = ({ user, onLogout }) => {
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -106,6 +90,5 @@ const Navbar = ({ user, onLogout }) => {
         </AppBar>
     );
 };
->>>>>>> Frontend
 
 export default Navbar;
