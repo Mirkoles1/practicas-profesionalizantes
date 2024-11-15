@@ -1,5 +1,3 @@
-// src/Components/CrearProyecto.js
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -11,7 +9,8 @@ import {
     Typography, 
     Box, 
     Snackbar, 
-    Alert 
+    Alert, 
+    MenuItem 
 } from '@mui/material';
 
 const CrearProyecto = () => {
@@ -19,23 +18,22 @@ const CrearProyecto = () => {
         nombre_proyecto: '',
         descripcion: '',
         fecha_inicio: '',
-        fecha_fin: ''
+        fecha_fin: '',
+        estado: 'Pendiente'  // Valor predeterminado
     });
 
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const navigate = useNavigate();
 
-    // Manejar el cambio en los campos del formulario
     const handleChange = (e) => {
         setProyecto({ ...proyecto, [e.target.name]: e.target.value });
     };
 
-    // Manejar el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token'); // Obtén el token de autorización
+            const token = localStorage.getItem('token');
             await axios.post(
                 `${process.env.REACT_APP_API_URL}/proyectos`,
                 proyecto,
@@ -44,7 +42,7 @@ const CrearProyecto = () => {
                 }
             );
             setSuccess('Proyecto creado exitosamente');
-            setTimeout(() => navigate('/proyectos'), 1500); // Redirigir tras éxito
+            setTimeout(() => navigate('/proyectos'), 1500);
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'Error al crear el proyecto';
             setError(errorMessage);
@@ -97,6 +95,20 @@ const CrearProyecto = () => {
                         margin="normal"
                         InputLabelProps={{ shrink: true }}
                     />
+                    <TextField
+                        select
+                        label="Estado"
+                        name="estado"
+                        value={proyecto.estado}
+                        onChange={handleChange}
+                        fullWidth
+                        required
+                        margin="normal"
+                    >
+                        <MenuItem value="Pendiente">Pendiente</MenuItem>
+                        <MenuItem value="En Progreso">En Progreso</MenuItem>
+                        <MenuItem value="Completado">Completado</MenuItem>
+                    </TextField>
                     <Button 
                         type="submit" 
                         variant="contained" 
@@ -109,7 +121,6 @@ const CrearProyecto = () => {
                 </Box>
             </Paper>
 
-            {/* Snackbar de éxito o error */}
             <Snackbar 
                 open={!!error || !!success} 
                 autoHideDuration={6000} 

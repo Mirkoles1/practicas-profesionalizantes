@@ -1,8 +1,6 @@
-// models/Proyecto.js
 const { DataTypes } = require('sequelize');
-
 const sequelize = require('../database');
-const UsuarioProyecto = require('./UsuarioProyecto'); // Importa el modelo
+const UsuarioProyecto = require('./UsuarioProyecto'); // Importa el modelo UsuarioProyecto
 
 const Proyecto = sequelize.define('Proyecto', {
     id_proyecto: {
@@ -25,6 +23,11 @@ const Proyecto = sequelize.define('Proyecto', {
     fecha_fin: {
         type: DataTypes.DATE,
         allowNull: true,
+    },
+    estado: {
+        type: DataTypes.ENUM('Pendiente', 'En Progreso', 'Completado'),
+        allowNull: false,
+        defaultValue: 'Pendiente', // Valor por defecto
     }
 }, {
     tableName: 'proyecto',
@@ -32,6 +35,6 @@ const Proyecto = sequelize.define('Proyecto', {
 });
 
 // Define la relación entre Proyecto y UsuarioProyecto
-Proyecto.hasMany(UsuarioProyecto, { foreignKey: 'id_proyecto' });
+Proyecto.hasMany(UsuarioProyecto, { foreignKey: 'id_proyecto', onDelete: 'CASCADE' });
 
 module.exports = Proyecto;

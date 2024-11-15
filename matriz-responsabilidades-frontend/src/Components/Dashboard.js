@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { PieChart, Pie, Tooltip } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [proyectos, setProyectos] = useState([]);
+  const navigate = useNavigate();
 
-  // Dashboard.js - Ejemplo de configuración del token
+  const user = JSON.parse(localStorage.getItem('user')); // Cargar usuario desde localStorage
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:4000/api/proyectos', {
-        headers: { Authorization: `Bearer ${token}` } // Incluye "Bearer "
+        headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => setProyectos(response.data))
     .catch(error => console.error('Error al obtener proyectos:', error));
   }, []);
-
 
   return (
     <div>

@@ -15,14 +15,22 @@ import {
     TextField,
     Grid,
     Snackbar,
-    Alert
+    Alert,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 
 const ResponsibilityMatrix = () => {
     const [projects, setProjects] = useState([]);
+    const [employees, setEmployees] = useState([]);  // Employees list
     const [newActivity, setNewActivity] = useState({ nombre_actividad: '', descripcion: '' });
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [assignEmployeeDialogOpen, setAssignEmployeeDialogOpen] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+    const [selectedActivityId, setSelectedActivityId] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [projectData, setProjectData] = useState({ nombre_proyecto: '', descripcion: '' });
     const [error, setError] = useState(null);
@@ -32,6 +40,7 @@ const ResponsibilityMatrix = () => {
 
     useEffect(() => {
         loadProjects();
+        loadEmployees();
     }, []);
 
     // Cargar proyectos asociados con el usuario
@@ -45,13 +54,57 @@ const ResponsibilityMatrix = () => {
                 return;
             }
 
-            // Cargar proyectos asociados con el usuario autenticado
             const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/proyectos/usuario/${user.id_usuario}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProjects(data);
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'Error al cargar los proyectos.';
+            setError(errorMessage);
+        }
+    };
+
+    // Cargar empleados
+    const loadEmployees = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/empleados`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setEmployees(data);
+        } catch (error) {
+            const errorMessage = error.response?.data?.error || 'Error al cargar los empleados.';
+            setError(errorMessage);
+        }
+    };
+
+    // Manejar la apertura del diálogo para asignar un empleado
+    const handleAssignEmployee = (projectId) => {
+        setSelectedProjectId(projectId);
+        setAssignEmployeeDialogOpen(true);
+    };
+
+    // Cerrar el diálogo de asignación de empleado
+    const handleCloseAssignEmployeeDialog = () => {
+        setAssignEmployeeDialogOpen(false);
+        setSelectedEmployeeId(null);
+    };
+
+    // Asignar empleado al proyecto
+    const handleAssignEmployeeToProject = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.post(
+                `${process.env.REACT_APP_API_URL}/proyectos/${selectedProjectId}/empleado`,
+                { id_empleado: selectedEmployeeId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setSuccess('Empleado asignado exitosamente');
+            handleCloseAssignEmployeeDialog();
+            loadProjects(); // Recargar proyectos para ver cambios
+        } catch (error) {
+            const errorMessage = error.response?.data?.error || 'Error al asignar el empleado.';
             setError(errorMessage);
         }
     };
@@ -164,6 +217,9 @@ const ResponsibilityMatrix = () => {
                                 <Typography variant="body2" color="textSecondary">
                                     Fecha de Fin: {project.fecha_fin || 'N/A'}
                                 </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Estado: {project.estado || 'N/A'}
+                                </Typography>
 
                                 <Typography variant="h6" style={{ marginTop: '16px' }}>
                                     Actividades
@@ -208,11 +264,48 @@ const ResponsibilityMatrix = () => {
                                 >
                                     Eliminar Proyecto
                                 </Button>
+
+                                <Button
+                                    variant="outlined"
+                                    color="success"
+                                    style={{ marginTop: '10px' }}
+                                    onClick={() => handleAssignEmployee(project.id_proyecto)}
+                                >
+                                    Asignar Empleado
+                                </Button>
                             </CardContent>
                         </Card>
                     </Grid>
                 ))}
             </Grid>
+
+            {/* Diálogo para asignar un empleado */}
+            <Dialog open={assignEmployeeDialogOpen} onClose={handleCloseAssignEmployeeDialog}>
+                <DialogTitle>Asignar Empleado al Proyecto</DialogTitle>
+                <DialogContent>
+                    <FormControl fullWidth>
+                        <InputLabel>Empleado</InputLabel>
+                        <Select
+                            value={selectedEmployeeId}
+                            onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                        >
+                            {employees.map((employee) => (
+                                <MenuItem key={employee.id_empleado} value={employee.id_empleado}>
+                                    {employee.nombre_empleado}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseAssignEmployeeDialog} color="secondary">
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleAssignEmployeeToProject} color="primary">
+                        Asignar Empleado
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             {/* Diálogo para agregar nueva actividad */}
             <Dialog open={dialogOpen} onClose={handleCloseDialog}>
@@ -242,38 +335,6 @@ const ResponsibilityMatrix = () => {
                     </Button>
                     <Button onClick={handleAddActivity} color="primary">
                         Agregar Actividad
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Diálogo para editar un proyecto */}
-            <Dialog open={editMode} onClose={() => setEditMode(false)}>
-                <DialogTitle>Editar Proyecto</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Nombre del Proyecto"
-                        fullWidth
-                        value={projectData.nombre_proyecto}
-                        onChange={(e) => setProjectData({ ...projectData, nombre_proyecto: e.target.value })}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Descripción"
-                        fullWidth
-                        multiline
-                        rows={3}
-                        value={projectData.descripcion}
-                        onChange={(e) => setProjectData({ ...projectData, descripcion: e.target.value })}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setEditMode(false)} color="secondary">
-                        Cancelar
-                    </Button>
-                    <Button onClick={handleUpdateProject} color="primary">
-                        Actualizar Proyecto
                     </Button>
                 </DialogActions>
             </Dialog>

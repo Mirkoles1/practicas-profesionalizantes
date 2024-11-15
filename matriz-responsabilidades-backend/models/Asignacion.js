@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');  // Asegúrate de que la conexión sea correcta
 const Actividad = require('./Actividad');  // Importar el modelo Actividad
-const Usuario = require('./Usuario');
+const Usuario = require('./Usuario');      // Importar el modelo Usuario
 
 // Definir el modelo Asignación
 const Asignacion = sequelize.define('Asignacion', {
@@ -38,6 +38,10 @@ const Asignacion = sequelize.define('Asignacion', {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+    },
+    comentario: {
+        type: DataTypes.TEXT,
+        allowNull: true,   // Permite que el comentario sea nulo
     },
 }, {
     tableName: 'asignacion',  // Nombre de la tabla en la base de datos
