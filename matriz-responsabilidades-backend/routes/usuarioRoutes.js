@@ -22,4 +22,7 @@ router.delete('/delete', authenticate, usuarioController.deleteUsuario);
 // Obtener datos del usuario actual
 router.get('/user', authenticate, usuarioController.getUsuario);
 
+// Obtener los empleados
+router.get('/empleados', usuarioController.getEmpleados);
+
 module.exports = router;

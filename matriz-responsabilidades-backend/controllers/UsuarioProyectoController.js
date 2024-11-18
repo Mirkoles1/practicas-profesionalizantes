@@ -40,8 +40,23 @@ const deleteUsuarioProyecto = async (req, res) => {
     }
 };
 
+
+const asignarProyectoEmpleado = async (req, res) => {
+    const { id_usuario, id_proyecto } = req.body;
+
+    try {
+        const relacion = await UsuarioProyecto.create({ id_usuario, id_proyecto });
+        res.status(201).json(relacion);
+    } catch (error) {
+        console.error('Error al asignar usuario al proyecto:', error);
+        res.status(500).json({ error: 'Error al asignar usuario al proyecto' });
+    }
+};
+
+
 module.exports = {
     createUsuarioProyecto,
     getAllUsuarioProyectos,
     deleteUsuarioProyecto,
+    asignarProyectoEmpleado,
 };

@@ -33,7 +33,7 @@ const Actividad = sequelize.define('Actividad', {
     },
 }, {
     tableName: 'actividad',
-    timestamps: true,  // Usamos timestamps para registrar fechas de creación y actualización
+    timestamps: false,  // Usamos timestamps para registrar fechas de creación y actualización
 });
 
 // Relación con el modelo Proyecto (ya está definida en tu modelo de Proyecto, por lo que no es necesario duplicar aquí)

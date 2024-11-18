@@ -17,8 +17,6 @@ const CrearProyecto = () => {
     const [proyecto, setProyecto] = useState({
         nombre_proyecto: '',
         descripcion: '',
-        fecha_inicio: '',
-        fecha_fin: '',
         estado: 'Pendiente'  // Valor predeterminado
     });
 
@@ -34,6 +32,7 @@ const CrearProyecto = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
+            // Aquí no se envían las fechas, ya que no están en el modelo
             await axios.post(
                 `${process.env.REACT_APP_API_URL}/proyectos`,
                 proyecto,
@@ -75,7 +74,8 @@ const CrearProyecto = () => {
                         rows={3}
                         margin="normal"
                     />
-                    <TextField
+                    {/* Eliminamos las fechas porque no están en el modelo */}
+                    {/* <TextField
                         label="Fecha de Inicio"
                         name="fecha_inicio"
                         type="date"
@@ -94,7 +94,7 @@ const CrearProyecto = () => {
                         fullWidth
                         margin="normal"
                         InputLabelProps={{ shrink: true }}
-                    />
+                    /> */}
                     <TextField
                         select
                         label="Estado"

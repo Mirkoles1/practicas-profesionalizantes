@@ -16,5 +16,9 @@ router.put('/:id', authenticate, proyectoController.updateProyecto);
 router.delete('/:id', authenticate, isAdmin, proyectoController.deleteProyecto);
 // Obtener la matriz de responsabilidades
 router.get('/matriz', authenticate, proyectoController.getMatrizResponsabilidades);
+// Ruta para obtener un proyecto específico
+router.get('/:id', authenticate, proyectoController.getProyectoById);
+
+router.get('/:id/actividades-y-notas', authenticate, proyectoController.getActividadesYNotas);
 
 module.exports = router;

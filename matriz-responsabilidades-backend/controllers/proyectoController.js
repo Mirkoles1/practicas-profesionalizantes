@@ -3,6 +3,8 @@
 const Proyecto = require('../models/Proyecto');
 const UsuarioProyecto = require('../models/UsuarioProyecto');
 const Actividad = require('../models/Actividad');
+const Notas = require('../models/Notas');
+const Usuario = require('../models/Usuario');
 
 // Crear un nuevo proyecto y asignar al usuario creador en UsuarioProyecto
 exports.createProyecto = async (req, res) => {
@@ -136,3 +138,65 @@ exports.getMatrizResponsabilidades = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener la matriz de responsabilidades' });
     }
 };
+
+// Obtener un proyecto específico por su ID
+exports.getProyectoById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const proyecto = await Proyecto.findOne({
+            where: { id_proyecto: id },
+            include: [
+                {
+                    model: UsuarioProyecto,
+                    attributes: ['id_usuario'], // Incluye los usuarios relacionados
+                },
+                {
+                    model: Actividad,
+                    attributes: ['id_actividad', 'nombre_actividad', 'descripcion'], // Incluye las actividades relacionadas
+                }
+            ]
+        });
+
+        if (!proyecto) {
+            return res.status(404).json({ error: 'Proyecto no encontrado' });
+        }
+
+        res.json(proyecto);
+    } catch (error) {
+        console.error('Error al obtener el proyecto:', error);
+        res.status(500).json({ error: 'Error al obtener el proyecto' });
+    }
+};
+
+
+exports.getActividadesYNotas = async (req, res) => {
+    const { id } = req.params; // ID del proyecto
+    try {
+      // Buscar actividades y notas relacionadas al proyecto
+      const actividades = await Actividad.findAll({
+        where: { id_proyecto: id },
+        attributes: ['id_actividad', 'nombre_actividad', 'descripcion', 'estadoActividad'],
+        include: [
+          {
+            model: Usuario, // Si necesitas incluir usuarios asignados
+            attributes: ['id_usuario', 'nombre_usuario'],
+          },
+        ],
+      });
+  
+      const notas = await Notas.findAll({
+        where: { id_proyecto: id },
+        attributes: ['id_nota', 'titulo', 'descripcion'],
+      });
+  
+      if (!actividades.length && !notas.length) {
+        return res.status(404).json({ error: 'No se encontraron actividades o notas para este proyecto' });
+      }
+  
+      res.json({ actividades, notas });
+    } catch (error) {
+      console.error('Error al obtener actividades y notas:', error);
+      res.status(500).json({ error: 'Error al obtener actividades y notas del proyecto' });
+    }
+  };

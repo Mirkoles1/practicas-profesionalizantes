@@ -15,24 +15,14 @@ import {
     TextField,
     Grid,
     Snackbar,
-    Alert,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel
+    Alert
 } from '@mui/material';
 
 const ResponsibilityMatrix = () => {
     const [projects, setProjects] = useState([]);
-    const [employees, setEmployees] = useState([]);  // Employees list
-    const [newActivity, setNewActivity] = useState({ nombre_actividad: '', descripcion: '' });
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [assignEmployeeDialogOpen, setAssignEmployeeDialogOpen] = useState(false);
-    const [selectedProjectId, setSelectedProjectId] = useState(null);
-    const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
-    const [selectedActivityId, setSelectedActivityId] = useState(null);
-    const [editMode, setEditMode] = useState(false);
     const [projectData, setProjectData] = useState({ nombre_proyecto: '', descripcion: '' });
+    const [editMode, setEditMode] = useState(false);
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
@@ -40,7 +30,6 @@ const ResponsibilityMatrix = () => {
 
     useEffect(() => {
         loadProjects();
-        loadEmployees();
     }, []);
 
     // Cargar proyectos asociados con el usuario
@@ -59,97 +48,14 @@ const ResponsibilityMatrix = () => {
             });
             setProjects(data);
         } catch (error) {
-            const errorMessage = error.response?.data?.error || 'Error al cargar los proyectos.';
-            setError(errorMessage);
+            handleApiError(error, 'Error al cargar los proyectos.');
         }
     };
 
-    // Cargar empleados
-    const loadEmployees = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/empleados`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setEmployees(data);
-        } catch (error) {
-            const errorMessage = error.response?.data?.error || 'Error al cargar los empleados.';
-            setError(errorMessage);
-        }
-    };
-
-    // Manejar la apertura del diálogo para asignar un empleado
-    const handleAssignEmployee = (projectId) => {
-        setSelectedProjectId(projectId);
-        setAssignEmployeeDialogOpen(true);
-    };
-
-    // Cerrar el diálogo de asignación de empleado
-    const handleCloseAssignEmployeeDialog = () => {
-        setAssignEmployeeDialogOpen(false);
-        setSelectedEmployeeId(null);
-    };
-
-    // Asignar empleado al proyecto
-    const handleAssignEmployeeToProject = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            await axios.post(
-                `${process.env.REACT_APP_API_URL}/proyectos/${selectedProjectId}/empleado`,
-                { id_empleado: selectedEmployeeId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            setSuccess('Empleado asignado exitosamente');
-            handleCloseAssignEmployeeDialog();
-            loadProjects(); // Recargar proyectos para ver cambios
-        } catch (error) {
-            const errorMessage = error.response?.data?.error || 'Error al asignar el empleado.';
-            setError(errorMessage);
-        }
-    };
-
-    // Manejar la apertura del diálogo para agregar una nueva actividad
-    const handleOpenDialog = (projectId) => {
-        setSelectedProjectId(projectId);
-        setDialogOpen(true);
-    };
-
-    // Cerrar el diálogo y resetear los campos
-    const handleCloseDialog = () => {
-        setDialogOpen(false);
-        setNewActivity({ nombre_actividad: '', descripcion: '' });
-    };
-
-    // Agregar una nueva actividad al proyecto seleccionado
-    const handleAddActivity = async () => {
-        try {
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                setError('No se encontró el token de autorización. Por favor, inicia sesión.');
-                return;
-            }
-
-            await axios.post(
-                `${process.env.REACT_APP_API_URL}/actividades`,
-                { ...newActivity, id_proyecto: selectedProjectId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            setSuccess('Actividad agregada exitosamente');
-            handleCloseDialog();
-            loadProjects(); // Recargar proyectos para actualizar actividades
-        } catch (error) {
-            const errorMessage = error.response?.data?.error || 'Error al agregar la actividad.';
-            console.log(errorMessage);
-            setError(errorMessage);
-        }
-    };
-
-    // Redirigir a la página de creación de proyecto
-    const handleAddProject = () => {
-        navigate('/crear-proyecto');
+    // Manejo de errores comunes de API
+    const handleApiError = (error, defaultMessage) => {
+        const errorMessage = error.response?.data?.error || defaultMessage;
+        setError(errorMessage);
     };
 
     // Manejar la apertura del modo de edición de proyecto
@@ -173,9 +79,13 @@ const ResponsibilityMatrix = () => {
             setEditMode(false);
             loadProjects();
         } catch (error) {
-            const errorMessage = error.response?.data?.error || 'Error al actualizar el proyecto.';
-            setError(errorMessage);
+            handleApiError(error, 'Error al actualizar el proyecto.');
         }
+    };
+
+    // Ver detalles del proyecto
+    const handleViewProjectDetails = (projectId) => {
+        navigate(`/proyecto-detalle/${projectId}`);
     };
 
     // Eliminar proyecto
@@ -189,9 +99,13 @@ const ResponsibilityMatrix = () => {
             setSuccess('Proyecto eliminado exitosamente');
             loadProjects();
         } catch (error) {
-            const errorMessage = error.response?.data?.error || 'Error al eliminar el proyecto.';
-            setError(errorMessage);
+            handleApiError(error, 'Error al eliminar el proyecto.');
         }
+    };
+
+    // Redirigir a la página de creación de proyecto
+    const handleAddProject = () => {
+        navigate('/crear-proyecto');
     };
 
     return (
@@ -212,42 +126,18 @@ const ResponsibilityMatrix = () => {
                                     {project.descripcion}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Fecha de Inicio: {project.fecha_inicio || 'N/A'}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Fecha de Fin: {project.fecha_fin || 'N/A'}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
                                     Estado: {project.estado || 'N/A'}
                                 </Typography>
-
-                                <Typography variant="h6" style={{ marginTop: '16px' }}>
-                                    Actividades
-                                </Typography>
-                                {project.Actividades && project.Actividades.length > 0 ? (
-                                    <ul>
-                                        {project.Actividades.map((actividad) => (
-                                            <li key={actividad.id_actividad}>
-                                                <Typography variant="body2">
-                                                    {actividad.nombre_actividad}: {actividad.descripcion}
-                                                </Typography>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <Typography variant="body2" color="textSecondary">
-                                        No hay actividades asignadas
-                                    </Typography>
-                                )}
 
                                 <Button
                                     variant="outlined"
                                     color="primary"
                                     style={{ marginTop: '10px', marginRight: '10px' }}
-                                    onClick={() => handleOpenDialog(project.id_proyecto)}
+                                    onClick={() => handleViewProjectDetails(project.id_proyecto)}
                                 >
-                                    Crear Actividad
+                                    Ver Detalles
                                 </Button>
+
                                 <Button
                                     variant="outlined"
                                     color="secondary"
@@ -256,6 +146,7 @@ const ResponsibilityMatrix = () => {
                                 >
                                     Editar Proyecto
                                 </Button>
+
                                 <Button
                                     variant="outlined"
                                     color="error"
@@ -264,80 +155,55 @@ const ResponsibilityMatrix = () => {
                                 >
                                     Eliminar Proyecto
                                 </Button>
-
-                                <Button
-                                    variant="outlined"
-                                    color="success"
-                                    style={{ marginTop: '10px' }}
-                                    onClick={() => handleAssignEmployee(project.id_proyecto)}
-                                >
-                                    Asignar Empleado
-                                </Button>
                             </CardContent>
                         </Card>
                     </Grid>
                 ))}
             </Grid>
 
-            {/* Diálogo para asignar un empleado */}
-            <Dialog open={assignEmployeeDialogOpen} onClose={handleCloseAssignEmployeeDialog}>
-                <DialogTitle>Asignar Empleado al Proyecto</DialogTitle>
-                <DialogContent>
-                    <FormControl fullWidth>
-                        <InputLabel>Empleado</InputLabel>
-                        <Select
-                            value={selectedEmployeeId}
-                            onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                        >
-                            {employees.map((employee) => (
-                                <MenuItem key={employee.id_empleado} value={employee.id_empleado}>
-                                    {employee.nombre_empleado}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAssignEmployeeDialog} color="secondary">
-                        Cancelar
-                    </Button>
-                    <Button onClick={handleAssignEmployeeToProject} color="primary">
-                        Asignar Empleado
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {/* Formulario de edición de proyecto */}
+            {editMode && (
+                <Dialog open={editMode} onClose={() => setEditMode(false)}>
+                    <DialogTitle>Editar Proyecto</DialogTitle>
+                    <DialogContent>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Nombre del Proyecto"
+                                    fullWidth
+                                    value={projectData.nombre_proyecto}
+                                    onChange={(e) =>
+                                        setProjectData({ ...projectData, nombre_proyecto: e.target.value })
+                                    }
+                                    margin="normal"
+                                />
+                            </Grid>
 
-            {/* Diálogo para agregar nueva actividad */}
-            <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-                <DialogTitle>Agregar Nueva Actividad</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Nombre de la Actividad"
-                        fullWidth
-                        value={newActivity.nombre_actividad}
-                        onChange={(e) => setNewActivity({ ...newActivity, nombre_actividad: e.target.value })}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Descripción"
-                        fullWidth
-                        multiline
-                        rows={3}
-                        value={newActivity.descripcion}
-                        onChange={(e) => setNewActivity({ ...newActivity, descripcion: e.target.value })}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog} color="secondary">
-                        Cancelar
-                    </Button>
-                    <Button onClick={handleAddActivity} color="primary">
-                        Agregar Actividad
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Descripción del Proyecto"
+                                    fullWidth
+                                    multiline
+                                    rows={3}
+                                    value={projectData.descripcion}
+                                    onChange={(e) =>
+                                        setProjectData({ ...projectData, descripcion: e.target.value })
+                                    }
+                                    margin="normal"
+                                />
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setEditMode(false)} color="secondary">
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleUpdateProject} color="primary">
+                            Actualizar Proyecto
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
 
             {/* Notificación de éxito o error */}
             <Snackbar open={!!success || !!error} autoHideDuration={6000} onClose={() => { setSuccess(null); setError(null); }}>
