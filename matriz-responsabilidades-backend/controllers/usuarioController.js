@@ -122,3 +122,18 @@ exports.getUsuario = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los datos del usuario' });
     }
 };
+
+// Obtener todos los empleados
+exports.getEmpleados = async (req, res) => {
+    try {
+        const empleados = await Usuario.findAll({
+            where: { rol: 'Empleado' },
+            attributes: ['id_usuario', 'nombre_usuario', 'email'] // Solo devolver los campos necesarios
+        });
+
+        res.json(empleados);
+    } catch (error) {
+        console.error("Error al obtener empleados:", error);
+        res.status(500).json({ error: 'Error al obtener empleados' });
+    }
+};

@@ -1,11 +1,12 @@
+// controllers/proyectoController.js
+
 const Proyecto = require('../models/Proyecto');
 const UsuarioProyecto = require('../models/UsuarioProyecto');
-const Usuario = require('../models/Usuario');
 const Actividad = require('../models/Actividad');
 
 // Crear un nuevo proyecto y asignar al usuario creador en UsuarioProyecto
 exports.createProyecto = async (req, res) => {
-    const { nombre_proyecto, descripcion, fecha_inicio, fecha_fin, estado } = req.body;
+    const { nombre_proyecto, descripcion, estado } = req.body;  // Asegúrate de enviar solo los campos que existen
     const id_usuario = req.user?.id_usuario;
 
     if (!id_usuario) {
@@ -13,19 +14,20 @@ exports.createProyecto = async (req, res) => {
     }
 
     try {
+        // Crear el nuevo proyecto
         const nuevoProyecto = await Proyecto.create({
             nombre_proyecto,
             descripcion,
-            fecha_inicio,
-            fecha_fin,
-            estado: estado || 'Pendiente', // Establece estado predeterminado si no se proporciona
+            estado: estado || 'Pendiente', // Si no se pasa un estado, será 'Pendiente' por defecto
         });
 
+        // Asignar el proyecto al usuario
         await UsuarioProyecto.create({
             id_usuario,
-            id_proyecto: nuevoProyecto.id_proyecto
+            id_proyecto: nuevoProyecto.id_proyecto,
         });
 
+        // Devolver la respuesta con el proyecto creado
         res.status(201).json(nuevoProyecto);
     } catch (error) {
         console.error("Error en creación de proyecto y asignación de usuario:", error);
@@ -66,17 +68,24 @@ exports.getProyectosUsuario = async (req, res) => {
 
 // Actualizar un proyecto
 exports.updateProyecto = async (req, res) => {
-    const { id } = req.params;
-    const { nombre_proyecto, descripcion, fecha_inicio, fecha_fin, estado } = req.body;
+    const { id } = req.params;  // id del proyecto desde los parámetros de la URL
+    const { nombre_proyecto, descripcion, estado } = req.body;
 
     try {
-        // Actualizar los datos del proyecto
-        await Proyecto.update(
-            { nombre_proyecto, descripcion, fecha_inicio, fecha_fin, estado },
-            { where: { id_proyecto: id } }
-        );
+        const proyecto = await Proyecto.findByPk(id);
 
-        res.json({ message: 'Proyecto actualizado' });
+        if (!proyecto) {
+            return res.status(404).json({ error: 'Proyecto no encontrado' });
+        }
+
+        // Actualizar los datos del proyecto
+        await proyecto.update({
+            nombre_proyecto,
+            descripcion,
+            estado,
+        });
+
+        res.json({ message: 'Proyecto actualizado exitosamente', proyecto });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al actualizar el proyecto' });
@@ -94,7 +103,7 @@ exports.deleteProyecto = async (req, res) => {
             return res.status(404).json({ error: 'El proyecto no existe' });
         }
 
-        // Eliminar el proyecto (relaciones se eliminan por CASCADE)
+        // Eliminar el proyecto (las relaciones se eliminan por CASCADE)
         await proyecto.destroy();
         res.json({ message: 'Proyecto y asignaciones eliminados exitosamente' });
     } catch (error) {
@@ -102,7 +111,6 @@ exports.deleteProyecto = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar el proyecto' });
     }
 };
-
 
 // Obtener la matriz de responsabilidades para un usuario
 exports.getMatrizResponsabilidades = async (req, res) => {

@@ -16,14 +16,6 @@ const Proyecto = sequelize.define('Proyecto', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    fecha_inicio: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
-    fecha_fin: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
     estado: {
         type: DataTypes.ENUM('Pendiente', 'En Progreso', 'Completado'),
         allowNull: false,
