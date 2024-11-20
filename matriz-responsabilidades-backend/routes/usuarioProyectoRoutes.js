@@ -7,6 +7,7 @@ const {
     getAllUsuarioProyectos,
     deleteUsuarioProyecto,
     asignarProyectoEmpleado,
+    getEmpleadosByProyecto,
 } = require('../controllers/UsuarioProyectoController');
 
 // Ruta para crear una nueva relación usuario-proyecto
@@ -20,5 +21,8 @@ router.delete('/:id_usuario_proyecto', deleteUsuarioProyecto);
 
 // Ruta para asignar un empleado a proyecto
 router.post('/asignar', asignarProyectoEmpleado);
+
+// Ruta para obtener los empleados de un proyecto
+router.get('/proyectos/:id_proyecto/empleados', getEmpleadosByProyecto);
 
 module.exports = router;

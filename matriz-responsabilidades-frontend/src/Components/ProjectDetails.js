@@ -16,7 +16,10 @@ import {
   InputLabel,
   Snackbar,
   Alert,
+  IconButton,
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit'; // Importación de íconos
+import DeleteIcon from '@mui/icons-material/Delete'; // Importación de íconos
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
@@ -30,12 +33,38 @@ const ProjectDetails = () => {
   const [dialogNoteOpen, setDialogNoteOpen] = useState(false);
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
+  const [notas, setNotas] = useState([]);
+  const [editingActivity, setEditingActivity] = useState(null);
 
   useEffect(() => {
     loadProjectDetails();
     loadEmployees();
-    loadActividadesyNotas();
+    loadActividades();
+    loadNotas();
   }, []);
+
+  const loadNotas = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/notas/proyectos/${projectId}/notas`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log('Notas cargadas:', response.data);
+
+      setProject((prevProject) => ({
+        ...prevProject,
+        Notas: response.data,
+      }));
+    } catch (err) {
+      console.error('Error completo:', err);
+      const message = err.response?.data?.message || 'Error al cargar las notas del proyecto.';
+      setError(message);
+    }
+  };
+  
 
   const loadProjectDetails = async () => {
     try {
@@ -50,31 +79,43 @@ const ProjectDetails = () => {
     }
   };
 
-  const loadActividadesyNotas = async () => {
+  const loadActividades = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const { data } = await axios.get(
-        `${process.env.REACT_APP_API_URL}/proyectos/${projectId}/actividades-y-notas`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-  
-      // Separa actividades y notas
-      setProject((prevProject) => ({
-        ...prevProject,
-        Actividades: data.actividades,
-        Notas: data.notas,
-      }));
+        const token = localStorage.getItem('token');
+
+        // Cargar actividades
+        const actividadesResponse = await axios.get(
+            `${process.env.REACT_APP_API_URL}/actividades/proyecto/${projectId}/`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        setProject((prevProject) => ({
+            ...prevProject,
+            Actividades: actividadesResponse.data,
+        }));
     } catch (err) {
-      handleApiError(err, 'Error al cargar actividades y notas.');
+        handleApiError(err, 'Error al cargar actividades y notas.');
     }
   };
   
-
   const loadEmployees = async () => {
     try {
       const token = localStorage.getItem('token');
       const { data } = await axios.get(
         `${process.env.REACT_APP_API_URL}/auth/empleados`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEmployees(data);
+    } catch (err) {
+      handleApiError(err, 'Error al cargar los empleados.');
+    }
+  };
+
+  const loadEmployeesAll = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_API_URL}/usuario_proyecto/proyectos/${projectId}/empleados`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setEmployees(data);
@@ -103,6 +144,42 @@ const ProjectDetails = () => {
     } catch (err) {
       handleApiError(err, 'Error al agregar la actividad.');
     }
+  };
+
+  const handleEditActivity = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/actividades/${editingActivity.id_actividad}`,
+        { ...editingActivity },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSuccess('Actividad actualizada con éxito.');
+      setDialogActivityOpen(false);
+      setEditingActivity(null);
+      loadActividades();
+    } catch (err) {
+      handleApiError(err, 'Error al editar la actividad.');
+    }
+  };
+
+  const handleDeleteActivity = async (idActividad) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/actividades/${idActividad}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSuccess('Actividad eliminada con éxito.');
+      loadActividades();
+    } catch (err) {
+      handleApiError(err, 'Error al eliminar la actividad.');
+    }
+  };
+
+  const openEditDialog = (activity) => {
+    setEditingActivity(activity);
+    setDialogActivityOpen(true);
   };
 
   const handleAddNote = async () => {
@@ -159,36 +236,42 @@ const ProjectDetails = () => {
                 <Typography variant="body2" color="textSecondary">
                   Estado: {activity.estadoActividad}
                 </Typography>
-                {activity.Usuarios && (
-                  <ul>
-                    {activity.Usuarios.map((user) => (
-                      <li key={user.id_usuario}>{user.nombre_usuario}</li>
-                    ))}
-                  </ul>
-                )}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                  <IconButton onClick={() => openEditDialog(activity)} color="primary">
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleDeleteActivity(activity.id_actividad)}
+                    color="secondary"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
               </Card>
             ))
           ) : (
             <Typography>No hay actividades asignadas.</Typography>
           )}
 
+
           <Button variant="contained" onClick={() => setDialogActivityOpen(true)} style={{ marginTop: '10px' }}>
             Agregar Actividad
           </Button>
 
-          <Typography variant="h5" gutterBottom style={{ marginTop: '20px' }}>
-            Notas
+          <Typography variant="h5" gutterBottom>
+            Notas del Proyecto
           </Typography>
-          {project.Notas?.length > 0 ? (
-            project.Notas.map((note) => (
-              <Card key={note.id_nota} style={{ margin: '10px', padding: '10px' }}>
-                <Typography variant="h6">{note.titulo}</Typography>
-                <Typography>{note.descripcion}</Typography>
+          {project?.Notas?.length > 0 ? (
+            project.Notas.map((nota) => (
+              <Card key={nota.id_nota} style={{ margin: '10px', padding: '10px' }}>
+                <Typography variant="h6">{nota.titulo}</Typography>
+                <Typography>{nota.descripcion}</Typography>
               </Card>
             ))
           ) : (
             <Typography>No hay notas disponibles.</Typography>
           )}
+
 
           <Button variant="contained" onClick={() => setDialogNoteOpen(true)} style={{ marginTop: '10px' }}>
             Agregar Nota
@@ -245,6 +328,54 @@ const ProjectDetails = () => {
           </Button>
           <Button onClick={handleAddActivity} color="primary">
             Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialogs */}
+      <Dialog open={dialogActivityOpen} onClose={() => setDialogActivityOpen(false)}>
+        <DialogTitle>{editingActivity ? 'Editar Actividad' : 'Agregar Actividad'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Nombre de la Actividad"
+            value={editingActivity ? editingActivity.nombre_actividad : newActivity.nombre_actividad}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (editingActivity) {
+                setEditingActivity({ ...editingActivity, nombre_actividad: value });
+              } else {
+                setNewActivity({ ...newActivity, nombre_actividad: value });
+              }
+            }}
+            margin="dense"
+          />
+          <TextField
+            fullWidth
+            label="Descripción"
+            value={editingActivity ? editingActivity.descripcion : newActivity.descripcion}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (editingActivity) {
+                setEditingActivity({ ...editingActivity, descripcion: value });
+              } else {
+                setNewActivity({ ...newActivity, descripcion: value });
+              }
+            }}
+            margin="dense"
+            multiline
+            rows={3}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogActivityOpen(false)} color="secondary">
+            Cancelar
+          </Button>
+          <Button
+            onClick={editingActivity ? handleEditActivity : handleAddActivity}
+            color="primary"
+          >
+            {editingActivity ? 'Guardar Cambios' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

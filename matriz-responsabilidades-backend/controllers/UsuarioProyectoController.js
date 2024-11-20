@@ -1,5 +1,6 @@
 // controllers/UsuarioProyectoController.js
 
+const Usuario = require('../models/Usuario');
 const UsuarioProyecto = require('../models/UsuarioProyecto');
 
 // Crear una nueva relación usuario-proyecto
@@ -53,10 +54,39 @@ const asignarProyectoEmpleado = async (req, res) => {
     }
 };
 
+// Obtener los usuarios con rol 'empleado' asignados a un proyecto específico
+const getEmpleadosByProyecto = async (req, res) => {
+    const { id_proyecto } = req.params;
+
+    try {
+        // Consultar las relaciones usuario-proyecto para el proyecto específico
+        const empleados = await Usuario.findAll({
+            include: [
+                {
+                    model: UsuarioProyecto,
+                    where: { id_proyecto },
+                    attributes: [], // No necesitamos los datos de la relación, solo el usuario
+                },
+            ],
+            where: { rol: 'empleado' }, // Filtrar solo usuarios con rol "empleado"
+            attributes: ['id_usuario', 'nombre_usuario', 'correo'], // Atributos que queremos devolver
+        });
+
+        if (empleados.length > 0) {
+            res.status(200).json(empleados);
+        } else {
+            res.status(404).json({ message: 'No se encontraron empleados asignados a este proyecto.' });
+        }
+    } catch (error) {
+        console.error('Error al obtener empleados del proyecto:', error);
+        res.status(500).json({ message: 'Error al obtener empleados del proyecto.' });
+    }
+};
 
 module.exports = {
     createUsuarioProyecto,
     getAllUsuarioProyectos,
     deleteUsuarioProyecto,
     asignarProyectoEmpleado,
+    getEmpleadosByProyecto,
 };

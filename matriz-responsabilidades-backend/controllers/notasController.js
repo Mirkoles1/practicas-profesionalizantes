@@ -70,3 +70,22 @@ exports.deleteNota = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar la nota', error });
   }
 };
+
+// Obtener todas las notas de un proyecto
+exports.getNotasPorProyecto = async (req, res) => {
+  const { id } = req.params;
+  console.log(`Solicitando notas para el proyecto con ID: ${id}`); // Log para depuración
+
+  try {
+    const notas = await Notas.findAll({ where: { id_proyecto: id } });
+
+    if (notas.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron notas para este proyecto.' });
+    }
+
+    res.status(200).json(notas);
+  } catch (error) {
+    console.error('Error al obtener las notas:', error); // Registra el error en el servidor
+    res.status(500).json({ message: 'Error al obtener las notas.', error });
+  }
+};
