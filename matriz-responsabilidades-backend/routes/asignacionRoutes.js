@@ -15,4 +15,8 @@ router.put('/:id', asignacionController.updateAsignacion);
 // Eliminar una asignación
 router.delete('/:id', asignacionController.deleteAsignacion);
 
+// Ruta para obtener las actividades con usuarios asignados
+router.get('/actividades/:idProyecto/usuarios-asignados', getActividadesConUsuariosAsignados);
+
+
 module.exports = router;

@@ -23,6 +23,7 @@ const Asignacion = sequelize.define('Asignacion', {
     fecha_asignacion: {
         type: DataTypes.DATE,
         allowNull: false,
+        defaultValue: DataTypes.NOW, // Provee un valor por defecto si es necesario
     },
     id_usuario: {
         type: DataTypes.INTEGER,

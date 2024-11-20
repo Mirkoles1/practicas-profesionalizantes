@@ -104,3 +104,48 @@ exports.deleteAsignacion = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar la asignación' });
     }
 };
+
+exports.getActividadesConUsuariosAsignados = async (req, res) => {
+    try {
+      const { idProyecto } = req.params;
+  
+      // Buscar las actividades del proyecto
+      const actividades = await Actividad.findAll({
+        where: { id_proyecto: idProyecto },
+        include: [
+          {
+            model: Asignacion,
+            include: [
+              {
+                model: Usuario,
+                attributes: ['nombre_usuario'] // Obtener solo el nombre del usuario
+              }
+            ]
+          }
+        ]
+      });
+  
+      // Si no se encuentran actividades
+      if (!actividades) {
+        return res.status(404).json({ message: 'No se encontraron actividades para este proyecto.' });
+      }
+  
+      // Formatear la respuesta para obtener el nombre_usuario de cada actividad
+      const actividadesConUsuarios = actividades.map(actividad => {
+        const usuariosAsignados = actividad.Asignacions.map(asignacion => asignacion.Usuario.nombre_usuario);
+        
+        return {
+          id_actividad: actividad.id_actividad,
+          nombre_actividad: actividad.nombre_actividad,
+          usuariosAsignados: usuariosAsignados.length > 0 ? usuariosAsignados : null // Si no hay usuarios, devolver null
+        };
+      });
+  
+      // Devolver la respuesta con las actividades y los usuarios asignados
+      return res.status(200).json(actividadesConUsuarios);
+  
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Error al obtener las actividades con usuarios asignados.' });
+    }
+  };

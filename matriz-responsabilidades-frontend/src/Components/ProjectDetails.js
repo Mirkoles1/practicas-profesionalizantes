@@ -37,12 +37,18 @@ const ProjectDetails = () => {
   const [error, setError] = useState(null);
   const [notas, setNotas] = useState([]);
   const [editingActivity, setEditingActivity] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [dialogAssignOpen, setDialogAssignOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedEmployeeForActivity, setSelectedEmployeeForActivity] = useState('');
+
 
   useEffect(() => {
     loadProjectDetails();
     loadEmployees();
     loadActividades();
     loadNotas();
+    loadProjectActivities();
   }, []);
 
   const loadNotas = async () => {
@@ -78,6 +84,20 @@ const ProjectDetails = () => {
       setProject(data);
     } catch (err) {
       handleApiError(err, 'Error al cargar el proyecto.');
+    }
+  };
+
+  const loadProjectActivities = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_API_URL}/actividades/${projectId}/usuarios-asignados`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setActivities(data);
+    } catch (err) {
+      handleApiError(err, 'Error al cargar las asignaciones.');
+      setError('Error al cargar las asignaciones.');
     }
   };
 
@@ -125,6 +145,26 @@ const ProjectDetails = () => {
       handleApiError(err, 'Error al cargar los empleados.');
     }
   };
+
+  const handleAssignEmployeeToActivity = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/asignaciones/`,
+        { id_actividad: selectedActivity.id_actividad, id_usuario: selectedEmployeeForActivity },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      setSuccess('Empleado asignado con éxito a la actividad.');
+      setDialogAssignOpen(false);
+      setSelectedActivity(null);
+      setSelectedEmployeeForActivity('');
+      loadActividades(); // Actualiza las actividades
+    } catch (err) {
+      handleApiError(err, 'Error al asignar el empleado a la actividad.');
+    }
+  };
+  
 
   const handleApiError = (error, defaultMessage) => {
     const message = error.response?.data?.error || defaultMessage;
@@ -219,42 +259,70 @@ const ProjectDetails = () => {
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      {project && (
-        <>
-          <Typography variant="h4" gutterBottom>
-            Proyecto: {project.nombre_proyecto}
-          </Typography>
-          <Typography variant="h6">Descripción:</Typography>
-          <Typography paragraph>{project.descripcion}</Typography>
+          {project && (
+  <>
+    <Typography variant="h4" gutterBottom>
+      Proyecto: {project.nombre_proyecto}
+    </Typography>
+    <Typography variant="h6">Descripción:</Typography>
+    <Typography paragraph>{project.descripcion}</Typography>
 
-          <Typography variant="h5" gutterBottom>
-            Actividades
+    <Typography variant="h5" gutterBottom>
+      Actividades
+    </Typography>
+    {project.Actividades?.length > 0 ? (
+      project.Actividades.map((activity) => (
+        <Card key={activity.id_actividad} style={{ margin: '10px', padding: '10px' }}>
+          {/* Solo el título tiene la navegación */}
+          <Typography
+            variant="h6"
+            style={{ cursor: 'pointer', color: 'blue' }}
+            onClick={() => navigate(`/activity/${activity.id_actividad}`)}
+          >
+            {activity.nombre_actividad}
           </Typography>
-          {project.Actividades?.length > 0 ? (
-            project.Actividades.map((activity) => (
-              <Card key={activity.id_actividad} onClick={() => navigate(`/activity/${activity.id_actividad}`)} style={{ margin: '10px', padding: '10px' }}>
-                <Typography variant="h6">{activity.nombre_actividad}</Typography>
-                <Typography>{activity.descripcion}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Estado: {activity.estadoActividad}
-                </Typography>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                  <IconButton onClick={() => openEditDialog(activity)} color="primary">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleDeleteActivity(activity.id_actividad)}
-                    color="secondary"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
-              </Card>
-            ))
+          <Typography>{activity.descripcion}</Typography>
+          <Typography variant="body2" color="textSecondary">
+            Estado: {activity.estadoActividad}
+          </Typography>
+
+          {/* Mostrar empleado asignado si existe */}
+          {activity.usuariosAsignados ? (
+            <Typography variant="body2" color="textPrimary">
+              Asignado a: {activity.usuariosAsignados.nombre_usuario}
+            </Typography>
           ) : (
-            <Typography>No hay actividades asignadas.</Typography>
+            <Typography variant="body2" color="textSecondary">
+              Sin empleado asignado
+            </Typography>
           )}
 
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <IconButton onClick={() => openEditDialog(activity)} color="primary">
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => handleDeleteActivity(activity.id_actividad)}
+              color="secondary"
+            >
+              <DeleteIcon />
+            </IconButton>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                setSelectedActivity(activity);
+                setDialogAssignOpen(true);
+              }}
+            >
+              Asignar Empleado
+            </Button>
+          </div>
+        </Card>
+      ))
+    ) : (
+      <Typography>No hay actividades asignadas.</Typography>
+    )}
 
           <Button variant="contained" onClick={() => setDialogActivityOpen(true)} style={{ marginTop: '10px' }}>
             Agregar Actividad
@@ -302,6 +370,34 @@ const ProjectDetails = () => {
           </Button>
         </>
       )}
+
+<Dialog open={dialogAssignOpen} onClose={() => setDialogAssignOpen(false)}>
+  <DialogTitle>Asignar Empleado a la Actividad</DialogTitle>
+  <DialogContent>
+    <FormControl fullWidth>
+      <InputLabel>Empleado</InputLabel>
+      <Select
+        value={selectedEmployeeForActivity}
+        onChange={(e) => setSelectedEmployeeForActivity(e.target.value)}
+      >
+        {employees.map((employee) => (
+          <MenuItem key={employee.id_usuario} value={employee.id_usuario}>
+            {employee.nombre_usuario}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setDialogAssignOpen(false)} color="secondary">
+      Cancelar
+    </Button>
+    <Button onClick={handleAssignEmployeeToActivity} color="primary">
+      Asignar
+    </Button>
+  </DialogActions>
+</Dialog>
+
 
       {/* Dialogs */}
       <Dialog open={dialogActivityOpen} onClose={() => setDialogActivityOpen(false)}>
@@ -368,6 +464,26 @@ const ProjectDetails = () => {
             multiline
             rows={3}
           />
+          <FormControl fullWidth margin="dense">
+      <InputLabel id="estado-actividad-label">Estado Actividad</InputLabel>
+      <Select
+        labelId="estado-actividad-label"
+        value={editingActivity ? editingActivity.estadoActividad : newActivity.estadoActividad}
+        onChange={(e) => {
+          const value = e.target.value;
+          if (editingActivity) {
+            setEditingActivity({ ...editingActivity, estadoActividad: value });
+          } else {
+            setNewActivity({ ...newActivity, estadoActividad: value });
+          }
+        }}
+        label="Estado Actividad"
+      >
+        <MenuItem value="Pendiente">Pendiente</MenuItem>
+        <MenuItem value="En Progreso">En Progreso</MenuItem>
+        <MenuItem value="Completado">Completado</MenuItem>
+      </Select>
+    </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogActivityOpen(false)} color="secondary">

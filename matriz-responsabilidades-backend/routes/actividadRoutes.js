@@ -14,5 +14,7 @@ router.put('/:id', actividadController.updateActividad);
 router.delete('/:id', actividadController.deleteActividad);
 // Ruta para obtener una actividad por su ID
 router.get('/:id', actividadController.getActividadById);
+// Ruta para obtener los usuarios asignados a las actividades de un proyecto
+router.get('/:id/usuarios-asignados', actividadController.getUsuariosAsignadosPorProyecto);
 
 module.exports = router;
