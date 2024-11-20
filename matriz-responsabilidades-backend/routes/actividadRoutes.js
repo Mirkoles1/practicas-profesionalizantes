@@ -6,14 +6,13 @@ const actividadController = require('../controllers/actividadController');
 
 // Crear una nueva actividad
 router.post('/', actividadController.createActividad);
-
 // Obtener todas las actividades de un proyecto
 router.get('/proyecto/:id', actividadController.getActividadesPorProyecto);
-
 // Actualizar una actividad
 router.put('/:id', actividadController.updateActividad);
-
 // Eliminar una actividad
 router.delete('/:id', actividadController.deleteActividad);
+// Ruta para obtener una actividad por su ID
+router.get('/:id', actividadController.getActividadById);
 
 module.exports = router;

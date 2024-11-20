@@ -69,3 +69,24 @@ exports.deleteComentario = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el comentario', error });
   }
 };
+
+// Obtener todos los comentarios de una actividad
+exports.getComentariosPorActividad = async (req, res) => {
+  const { id_actividad } = req.params;
+
+  try {
+    // Buscar comentarios asociados a la actividad
+    const comentarios = await ComentarioAvance.findAll({
+      where: { id_actividad },
+    });
+
+    if (comentarios.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron comentarios para esta actividad' });
+    }
+
+    res.status(200).json(comentarios);
+  } catch (error) {
+    console.error('Error al obtener los comentarios de la actividad:', error);
+    res.status(500).json({ message: 'Error al obtener los comentarios de la actividad', error });
+  }
+};

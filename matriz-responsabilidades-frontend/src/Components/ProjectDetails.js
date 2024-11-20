@@ -20,9 +20,11 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit'; // Importación de íconos
 import DeleteIcon from '@mui/icons-material/Delete'; // Importación de íconos
+import { useNavigate } from 'react-router-dom';
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
+  const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
   const [employees, setEmployees] = useState([]);
@@ -230,7 +232,7 @@ const ProjectDetails = () => {
           </Typography>
           {project.Actividades?.length > 0 ? (
             project.Actividades.map((activity) => (
-              <Card key={activity.id_actividad} style={{ margin: '10px', padding: '10px' }}>
+              <Card key={activity.id_actividad} onClick={() => navigate(`/activity/${activity.id_actividad}`)} style={{ margin: '10px', padding: '10px' }}>
                 <Typography variant="h6">{activity.nombre_actividad}</Typography>
                 <Typography>{activity.descripcion}</Typography>
                 <Typography variant="body2" color="textSecondary">

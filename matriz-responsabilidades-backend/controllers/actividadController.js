@@ -88,3 +88,22 @@ exports.deleteActividad = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar la actividad' });
     }
 };
+
+// Obtener una actividad por su ID
+exports.getActividadById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Buscar la actividad por su ID
+        const actividad = await Actividad.findByPk(id);
+
+        if (!actividad) {
+            return res.status(404).json({ error: 'Actividad no encontrada' });
+        }
+
+        res.json(actividad);
+    } catch (error) {
+        console.error('Error al obtener la actividad:', error);
+        res.status(500).json({ error: 'Error al obtener la actividad' });
+    }
+};
