@@ -20,12 +20,12 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1>Bienvenido, {user?.nombre_usuario}</h1>
+      <h1>Bienvenido {user?.nombre_usuario}</h1>
       {user?.rol === 'admin' && <p>Eres administrador.</p>}
       <ul>
         {proyectos.map(proyecto => (
           <li key={proyecto.id} onClick={() => navigate(`/proyectos/${proyecto.id}`)}>
-            {proyecto.nombre} - {proyecto.estado}
+            {proyecto.nombre_proyecto} - {proyecto.estado}
           </li>
         ))}
       </ul>

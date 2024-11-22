@@ -25,4 +25,7 @@ router.get('/user', authenticate, usuarioController.getUsuario);
 // Obtener los empleados
 router.get('/empleados', usuarioController.getEmpleados);
 
+// Obtener los empleados de un proyecto
+router.get('/proyecto/:id_proyecto/empleados', usuarioController.getEmpleadosDeProyecto);
+
 module.exports = router;

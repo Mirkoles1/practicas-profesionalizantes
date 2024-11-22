@@ -20,5 +20,9 @@ router.get('/matriz', authenticate, proyectoController.getMatrizResponsabilidade
 router.get('/:id', authenticate, proyectoController.getProyectoById);
 
 router.get('/:id/actividades-y-notas', authenticate, proyectoController.getActividadesYNotas);
+// Verificar si un proyecto está completado
+router.put('/proyecto/:id/check-completado', proyectoController.checkProyectoCompletado);
+
+router.get('/proyectos/usuario/:id/progreso', proyectoController.getProyectosConProgreso);
 
 module.exports = router;
