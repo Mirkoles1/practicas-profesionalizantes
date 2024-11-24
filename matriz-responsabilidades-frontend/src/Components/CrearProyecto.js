@@ -74,41 +74,6 @@ const CrearProyecto = () => {
                         rows={3}
                         margin="normal"
                     />
-                    {/* Eliminamos las fechas porque no están en el modelo */}
-                    {/* <TextField
-                        label="Fecha de Inicio"
-                        name="fecha_inicio"
-                        type="date"
-                        value={proyecto.fecha_inicio}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{ shrink: true }}
-                    />
-                    <TextField
-                        label="Fecha de Fin"
-                        name="fecha_fin"
-                        type="date"
-                        value={proyecto.fecha_fin}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{ shrink: true }}
-                    /> */}
-                    <TextField
-                        select
-                        label="Estado"
-                        name="estado"
-                        value={proyecto.estado}
-                        onChange={handleChange}
-                        fullWidth
-                        required
-                        margin="normal"
-                    >
-                        <MenuItem value="Pendiente">Pendiente</MenuItem>
-                        <MenuItem value="En Progreso">En Progreso</MenuItem>
-                        <MenuItem value="Completado">Completado</MenuItem>
-                    </TextField>
                     <Button 
                         type="submit" 
                         variant="contained" 

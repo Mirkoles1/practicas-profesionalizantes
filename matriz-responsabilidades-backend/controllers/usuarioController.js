@@ -137,3 +137,28 @@ exports.getEmpleados = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener empleados' });
     }
 };
+
+// Obtener todos los empleados de un proyecto
+exports.getEmpleadosDeProyecto = async (req, res) => {
+    const { id_proyecto } = req.params;  // Obtener el id del proyecto desde los parámetros
+
+    try {
+        // Buscar el proyecto por su id
+        const proyecto = await Proyecto.findByPk(id_proyecto);
+
+        if (!proyecto) {
+            return res.status(404).json({ error: 'Proyecto no encontrado' });
+        }
+
+        // Obtener todos los empleados relacionados con el proyecto
+        const empleados = await proyecto.getUsuarios({
+            where: { rol: 'Empleado' }, // Filtrar solo los empleados
+            attributes: ['id_usuario', 'nombre_usuario', 'email'], // Solo devolver los campos necesarios
+        });
+
+        res.json(empleados);  // Responder con los empleados
+    } catch (error) {
+        console.error("Error al obtener empleados de proyecto:", error);
+        res.status(500).json({ error: 'Error al obtener empleados de proyecto' });
+    }
+};

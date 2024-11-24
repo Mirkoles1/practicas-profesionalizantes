@@ -1,5 +1,3 @@
-// Navbar.js
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
@@ -11,7 +9,6 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-
 
 const Navbar = ({ user, onLogout }) => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -31,9 +28,6 @@ const Navbar = ({ user, onLogout }) => {
                     <Button component={Link} to="/" color="inherit">
                         <Typography variant="button">Inicio</Typography>
                     </Button>
-                    <Button component={Link} to="/proyectos" color="inherit">
-                        <Typography variant="button">Proyectos</Typography>
-                    </Button>
                     {user?.rol === 'Administrador' && (
                         <>
                             <Button component={Link} to="/crear-empleado" color="inherit">
@@ -43,6 +37,11 @@ const Navbar = ({ user, onLogout }) => {
                                 <Typography variant="button">Matriz</Typography>
                             </Button>
                         </>
+                    )}
+                    {user?.rol === 'Empleado' && (
+                        <Button component={Link} to="/empleado/actividades" color="inherit">
+                            <Typography variant="button">Mis Actividades</Typography>
+                        </Button>
                     )}
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

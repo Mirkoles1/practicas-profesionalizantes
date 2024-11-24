@@ -15,6 +15,7 @@ import CrearProyecto from './Components/CrearProyecto';
 import Perfil from './Components/Perfil';
 import ProjectDetails from './Components/ProjectDetails';
 import ActivityDetails from './Components/ActivityDetails';
+import UserRoleProtectedComponent from './Components/EmpleadoActividades'
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -60,8 +61,6 @@ const App = () => {
                     <Route path="/" element={<Dashboard user={user} />} />
                     <Route path="/proyectos" element={<ProyectoList />} />
                     <Route path="/crear-proyecto" element={<CrearProyecto />} />
-
-                    {/* Ruta protegida para crear empleados solo para Administradores */}
                     <Route 
                         path="/crear-empleado" 
                         element={<ProtectedRoute element={<CrearEmpleado />} roles={['Administrador']} />} 
@@ -79,7 +78,10 @@ const App = () => {
                     <Route path="/signup" element={<SignUp />} />
                 </Routes>
             </div>
-            <Footer />
+            <footer>
+                <Footer/>
+            </footer>
+            
         </Router>
     );
 };

@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const actividadController = require('../controllers/actividadController');
+const { authenticate } = require('../middleware/authMiddleware');
 
 // Crear una nueva actividad
 router.post('/', actividadController.createActividad);
@@ -16,5 +17,7 @@ router.delete('/:id', actividadController.deleteActividad);
 router.get('/:id', actividadController.getActividadById);
 // Ruta para obtener los usuarios asignados a las actividades de un proyecto
 router.get('/:id/usuarios-asignados', actividadController.getUsuariosAsignadosPorProyecto);
+
+router.get('/empleado/actividades', authenticate, actividadController.getActividadesEmpleado);
 
 module.exports = router;

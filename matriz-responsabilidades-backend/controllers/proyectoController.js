@@ -200,3 +200,92 @@ exports.getActividadesYNotas = async (req, res) => {
       res.status(500).json({ error: 'Error al obtener actividades y notas del proyecto' });
     }
   };
+
+// Verificar si un proyecto está completado
+exports.checkProyectoCompletado = async (req, res) => {
+    const { id } = req.params; // ID del proyecto
+
+    try {
+        // Buscar todas las actividades relacionadas con el proyecto
+        const actividades = await Actividad.findAll({
+            where: { id_proyecto: id },
+            attributes: ['estadoActividad']
+        });
+
+        if (!actividades.length) {
+            return res.status(404).json({ error: 'El proyecto no tiene actividades asignadas' });
+        }
+
+        // Verificar si todas las actividades están completadas
+        const todasCompletadas = actividades.every(
+            actividad => actividad.estadoActividad === 'Completada'
+        );
+
+        if (todasCompletadas) {
+            // Actualizar el estado del proyecto a 'Completado'
+            const proyecto = await Proyecto.findByPk(id);
+
+            if (!proyecto) {
+                return res.status(404).json({ error: 'Proyecto no encontrado' });
+            }
+
+            await proyecto.update({ estado: 'Completado' });
+            return res.json({ message: 'El proyecto ha sido marcado como completado', proyecto });
+        } else {
+            return res.json({ message: 'El proyecto no puede ser marcado como completado, aún hay actividades pendientes' });
+        }
+    } catch (error) {
+        console.error('Error al verificar el estado del proyecto:', error);
+        res.status(500).json({ error: 'Error al verificar el estado del proyecto' });
+    }
+};
+
+// Obtener proyectos con conteo de actividades y actualizar el estado si están todas completadas
+exports.getProyectosConProgreso = async (req, res) => {
+    const id_usuario = req.params.id;
+
+    try {
+        // Obtener proyectos del usuario
+        const proyectos = await Proyecto.findAll({
+            include: [
+                {
+                    model: UsuarioProyecto,
+                    where: { id_usuario },
+                    attributes: []
+                },
+                {
+                    model: Actividad,
+                    attributes: ['estadoActividad'],
+                }
+            ]
+        });
+
+        // Formatear los datos con conteo de actividades
+        const proyectosConProgreso = await Promise.all(
+            proyectos.map(async (proyecto) => {
+                const actividades = proyecto.Actividads || [];
+                const totalActividades = actividades.length;
+                const actividadesCompletadas = actividades.filter(
+                    (actividad) => actividad.estadoActividad === 'Completada'
+                ).length;
+
+                // Actualizar estado del proyecto si todas las actividades están completadas
+                if (totalActividades > 0 && totalActividades === actividadesCompletadas) {
+                    await proyecto.update({ estado: 'Completado' });
+                }
+
+                return {
+                    ...proyecto.toJSON(),
+                    totalActividades,
+                    actividadesCompletadas,
+                };
+            })
+        );
+
+        res.json(proyectosConProgreso);
+    } catch (error) {
+        console.error('Error al obtener proyectos con progreso:', error);
+        res.status(500).json({ error: 'Error al obtener proyectos con progreso' });
+    }
+};
+

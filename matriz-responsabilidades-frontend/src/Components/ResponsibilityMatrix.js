@@ -30,6 +30,7 @@ const ResponsibilityMatrix = () => {
 
     useEffect(() => {
         loadProjects();
+        loadProjectsProgreso();
     }, []);
 
     // Cargar proyectos asociados con el usuario
@@ -46,11 +47,55 @@ const ResponsibilityMatrix = () => {
             const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/proyectos/usuario/${user.id_usuario}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            
+
             setProjects(data);
         } catch (error) {
             handleApiError(error, 'Error al cargar los proyectos.');
         }
     };
+
+    // Cargar proyectos asociados con el usuario y su progreso
+const loadProjectsProgreso = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user')); // Usuario desde localStorage
+
+        if (!token || !user) {
+            setError('No se encontró la sesión de usuario. Por favor, inicia sesión.');
+            return;
+        }
+
+        const { data } = await axios.get(
+            `${process.env.REACT_APP_API_URL}/proyectos/proyectos/usuario/${user.id_usuario}/progreso`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        setProjects(data);
+    } catch (error) {
+        handleApiError(error, 'Error al cargar los proyectos con Progreso.');
+    }
+};
+
+const checkProyectoCompletado = async (projectId) => {
+    try {
+        const token = localStorage.getItem('token');
+        const { data } = await axios.put(
+            `${process.env.REACT_APP_API_URL}/proyectos/proyecto/${projectId}/check-completado`,
+            {},
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+
+        setSuccess(data.message);
+        loadProjects(); // Recargar los proyectos para reflejar los cambios
+    } catch (error) {
+        handleApiError(error, 'Error al verificar el estado del proyecto.');
+    }
+};
+
 
     // Manejo de errores comunes de API
     const handleApiError = (error, defaultMessage) => {
@@ -127,6 +172,9 @@ const ResponsibilityMatrix = () => {
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
                                     Estado: {project.estado || 'N/A'}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Actividades Completadas: {project.actividadesCompletadas} / {project.totalActividades}
                                 </Typography>
 
                                 <Button

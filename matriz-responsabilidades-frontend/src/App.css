@@ -36,3 +36,10 @@
     transform: rotate(360deg);
   }
 }
+
+footer {
+  margin-top: auto; /* Esto empuja el pie de página hacia el fondo */
+  background-color: #f1f1f1; /* Cambia el color según tu preferencia */
+  padding: 10px;
+  text-align: center;
+}

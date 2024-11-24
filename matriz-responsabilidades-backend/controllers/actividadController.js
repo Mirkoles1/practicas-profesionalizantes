@@ -150,3 +150,30 @@ exports.getUsuariosAsignadosPorProyecto = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los usuarios asignados a las actividades' });
     }
 };
+
+// controllers/actividadController.js
+exports.getActividadesEmpleado = async (req, res) => {
+    const id_usuario = req.user?.id_usuario;
+
+    try {
+        const actividades = await Actividad.findAll({
+            where: { id_asignado: id_usuario }, // Campo que relaciona la actividad con el usuario
+            include: [
+                {
+                    model: Proyecto,
+                    attributes: ['id_proyecto', 'nombre_proyecto'],
+                },
+            ],
+        });
+
+        if (!actividades.length) {
+            return res.status(404).json({ error: 'No se encontraron actividades asignadas.' });
+        }
+
+        res.json(actividades);
+    } catch (error) {
+        console.error('Error al obtener actividades del empleado:', error);
+        res.status(500).json({ error: 'Error al obtener actividades del empleado.' });
+    }
+};
+

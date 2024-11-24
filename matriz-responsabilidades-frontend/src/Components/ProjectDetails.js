@@ -49,6 +49,7 @@ const ProjectDetails = () => {
     loadActividades();
     loadNotas();
     loadProjectActivities();
+    loadEmployeesAll();
   }, []);
 
   const loadNotas = async () => {
@@ -140,6 +141,7 @@ const ProjectDetails = () => {
         `${process.env.REACT_APP_API_URL}/usuario_proyecto/proyectos/${projectId}/empleados`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setEmployees(data);
     } catch (err) {
       handleApiError(err, 'Error al cargar los empleados.');
@@ -259,7 +261,11 @@ const ProjectDetails = () => {
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-          {project && (
+    <button
+    variant = "outlined"
+    onClick={()=> navigate("/matriz")}>
+    </button>
+    {project && (
   <>
     <Typography variant="h4" gutterBottom>
       Proyecto: {project.nombre_proyecto}
@@ -341,7 +347,6 @@ const ProjectDetails = () => {
           ) : (
             <Typography>No hay notas disponibles.</Typography>
           )}
-
 
           <Button variant="contained" onClick={() => setDialogNoteOpen(true)} style={{ marginTop: '10px' }}>
             Agregar Nota
@@ -464,26 +469,7 @@ const ProjectDetails = () => {
             multiline
             rows={3}
           />
-          <FormControl fullWidth margin="dense">
-      <InputLabel id="estado-actividad-label">Estado Actividad</InputLabel>
-      <Select
-        labelId="estado-actividad-label"
-        value={editingActivity ? editingActivity.estadoActividad : newActivity.estadoActividad}
-        onChange={(e) => {
-          const value = e.target.value;
-          if (editingActivity) {
-            setEditingActivity({ ...editingActivity, estadoActividad: value });
-          } else {
-            setNewActivity({ ...newActivity, estadoActividad: value });
-          }
-        }}
-        label="Estado Actividad"
-      >
-        <MenuItem value="Pendiente">Pendiente</MenuItem>
-        <MenuItem value="En Progreso">En Progreso</MenuItem>
-        <MenuItem value="Completado">Completado</MenuItem>
-      </Select>
-    </FormControl>
+
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogActivityOpen(false)} color="secondary">
