@@ -16,7 +16,7 @@ router.put('/:id', asignacionController.updateAsignacion);
 router.delete('/:id', asignacionController.deleteAsignacion);
 
 // Ruta para obtener las actividades con usuarios asignados
-router.get('/actividades/:idProyecto/usuarios-asignados', getActividadesConUsuariosAsignados);
+router.get('/actividades/:idProyecto/usuarios-asignados', asignacionController.getActividadesConUsuariosAsignados);
 
 
 module.exports = router;

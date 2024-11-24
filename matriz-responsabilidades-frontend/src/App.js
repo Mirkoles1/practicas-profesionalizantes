@@ -1,6 +1,4 @@
 // App.js
-
-
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
@@ -22,21 +20,34 @@ const App = () => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
+        // Recuperar token y usuario del localStorage
         const token = localStorage.getItem('token');
         const usuario = localStorage.getItem('user');
-        if (token && usuario) setUser(JSON.parse(usuario));
+        
+        if (token && usuario) {
+            try {
+                setUser(JSON.parse(usuario)); // Parsear usuario solo si es válido
+            } catch (error) {
+                console.error("Error al parsear el usuario desde localStorage:", error);
+            }
+        }
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        setUser(null);
+        setUser(null); // Limpiar el estado del usuario al hacer logout
     };
 
+    // Rutas protegidas que requieren autenticación y roles específicos
     const ProtectedRoute = ({ element, roles }) => {
-        if (!user) return <Navigate to="/login" />;
-        if (roles && !roles.includes(user.rol)) return <Navigate to="/" />;
-        return element;
+        if (!user) {
+            return <Navigate to="/login" />; // Redirige si no hay usuario
+        }
+        if (roles && !roles.includes(user.rol)) {
+            return <Navigate to="/" />; // Redirige si el rol no tiene permisos
+        }
+        return element; // Renderiza el componente si el usuario tiene acceso
     };
 
     return (
@@ -45,19 +56,26 @@ const App = () => {
             <Navbar user={user} onLogout={handleLogout} />
             <div style={{ padding: '20px' }}>
                 <Routes>
+                    {/* Rutas generales */}
                     <Route path="/" element={<Dashboard user={user} />} />
                     <Route path="/proyectos" element={<ProyectoList />} />
                     <Route path="/crear-proyecto" element={<CrearProyecto />} />
+
+                    {/* Ruta protegida para crear empleados solo para Administradores */}
                     <Route 
                         path="/crear-empleado" 
                         element={<ProtectedRoute element={<CrearEmpleado />} roles={['Administrador']} />} 
                     />
+
                     <Route path="/matriz" element={<ResponsibilityMatrix />} />
                     <Route path="/proyecto-detalle/:projectId" element={<ProjectDetails />} />
                     <Route path="/activity/:activityId" element={<ActivityDetails />} />
+
+                    {/* Ruta de login solo si el usuario no está logueado */}
                     <Route path="/login" element={user ? <Navigate to="/" /> : <LoginForm setUser={setUser} />} />
-                    <Route 
-                        path="/perfil" element={<Perfil />}/>
+
+                    {/* Perfil y SignUp */}
+                    <Route path="/perfil" element={<Perfil />} />
                     <Route path="/signup" element={<SignUp />} />
                 </Routes>
             </div>

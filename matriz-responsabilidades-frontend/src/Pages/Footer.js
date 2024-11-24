@@ -40,10 +40,10 @@ const Footer = () => (
       </Typography>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-        <Tooltip title="GitHub Usuario 1">
+        <Tooltip title="Emita314">
           <IconButton
             component={Link}
-            href="https://github.com/usuario1" // Enlace al perfil de GitHub del usuario 1
+            href="https://github.com/Emita314" // Enlace al perfil de GitHub del usuario 1
             target="_blank"
             color="inherit"
           >
