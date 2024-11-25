@@ -41,6 +41,7 @@ const ProjectDetails = () => {
   const [dialogAssignOpen, setDialogAssignOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [selectedEmployeeForActivity, setSelectedEmployeeForActivity] = useState('');
+  const [allEmployees, setAllEmployees] = useState([]); // Todos los empleados disponibles
 
 
   useEffect(() => {
@@ -351,6 +352,23 @@ const ProjectDetails = () => {
           <Button variant="contained" onClick={() => setDialogNoteOpen(true)} style={{ marginTop: '10px' }}>
             Agregar Nota
           </Button>
+
+          <Typography variant="h5" gutterBottom sx={{ marginTop: 4 }}>
+        Empleados Asignados al Proyecto
+      </Typography>
+
+      {employees.length > 0 ? (
+        employees.map((employee) => (
+          <Card key={employee.id_usuario} sx={{ marginBottom: 2, padding: 2 }}>
+            <Typography variant="h6">{employee.nombre_usuario}</Typography>
+            <Typography variant="body2" color="textSecondary">
+              Email: {employee.email}
+            </Typography>
+          </Card>
+        ))
+      ) : (
+        <Typography>No hay empleados asignados a este proyecto.</Typography>
+      )}
 
           <Typography variant="h5" gutterBottom style={{ marginTop: '20px' }}>
             Asignar Empleado al Proyecto

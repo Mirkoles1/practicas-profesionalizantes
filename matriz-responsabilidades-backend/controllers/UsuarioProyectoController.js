@@ -1,10 +1,9 @@
 // controllers/UsuarioProyectoController.js
-
 const Usuario = require('../models/Usuario');
 const UsuarioProyecto = require('../models/UsuarioProyecto');
 
 // Crear una nueva relación usuario-proyecto
-const createUsuarioProyecto = async (req, res) => {
+exports.createUsuarioProyecto = async (req, res) => {
     try {
         const { id_usuario, id_proyecto } = req.body;
         const newUsuarioProyecto = await UsuarioProyecto.create({ id_usuario, id_proyecto });
@@ -15,7 +14,7 @@ const createUsuarioProyecto = async (req, res) => {
 };
 
 // Obtener todas las relaciones usuario-proyecto
-const getAllUsuarioProyectos = async (req, res) => {
+exports.getAllUsuarioProyectos = async (req, res) => {
     try {
         const usuarioProyectos = await UsuarioProyecto.findAll();
         res.status(200).json(usuarioProyectos);
@@ -25,7 +24,7 @@ const getAllUsuarioProyectos = async (req, res) => {
 };
 
 // Eliminar una relación usuario-proyecto
-const deleteUsuarioProyecto = async (req, res) => {
+exports.deleteUsuarioProyecto = async (req, res) => {
     try {
         const { id_usuario_proyecto } = req.params;
         const deleted = await UsuarioProyecto.destroy({
@@ -42,7 +41,7 @@ const deleteUsuarioProyecto = async (req, res) => {
 };
 
 
-const asignarProyectoEmpleado = async (req, res) => {
+exports.asignarProyectoEmpleado = async (req, res) => {
     const { id_usuario, id_proyecto } = req.body;
 
     try {
@@ -55,7 +54,7 @@ const asignarProyectoEmpleado = async (req, res) => {
 };
 
 // Obtener los usuarios con rol 'empleado' asignados a un proyecto específico
-const getEmpleadosByProyecto = async (req, res) => {
+exports.getEmpleadosByProyecto = async (req, res) => {
     const { id_proyecto } = req.params;
 
     try {
@@ -83,10 +82,30 @@ const getEmpleadosByProyecto = async (req, res) => {
     }
 };
 
-module.exports = {
-    createUsuarioProyecto,
-    getAllUsuarioProyectos,
-    deleteUsuarioProyecto,
-    asignarProyectoEmpleado,
-    getEmpleadosByProyecto,
-};
+exports.getEmpleadosPorProyecto = async (req, res) => {
+    const { id_proyecto } = req.params;
+  
+    try {
+      // Obtener empleados relacionados con el proyecto específico
+      const empleados = await Usuario.findAll({
+        include: [
+          {
+            model: UsuarioProyecto,
+            where: { id_proyecto },
+            attributes: [], // No necesitamos los atributos de UsuarioProyecto
+          },
+        ],
+        where: { rol: 'Empleado' },
+        attributes: ['id_usuario', 'nombre_usuario', 'email'], // Solo los campos necesarios
+      });
+  
+      if (!empleados.length) {
+        return res.status(404).json({ message: 'No hay empleados asignados a este proyecto.' });
+      }
+  
+      res.status(200).json(empleados);
+    } catch (error) {
+      console.error('Error al obtener empleados por proyecto:', error);
+      res.status(500).json({ error: 'Error al obtener empleados por proyecto.' });
+    }
+  };
