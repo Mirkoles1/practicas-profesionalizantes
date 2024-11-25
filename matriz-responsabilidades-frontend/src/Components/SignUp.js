@@ -43,7 +43,8 @@ const SignUp = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                minHeight: '100vh',
+                marginTop: '2%',
+                minHeight: '50vh',
                 backgroundColor: '#f5f5f5',
             }}
         >
