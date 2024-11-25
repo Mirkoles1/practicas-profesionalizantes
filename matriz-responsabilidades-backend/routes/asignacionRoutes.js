@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const asignacionController = require('../controllers/asignacionController');
+const { authenticate } = require('../middleware/authMiddleware');
 
 // Crear una nueva asignación
 router.post('/', asignacionController.createAsignacion);
@@ -17,6 +18,9 @@ router.delete('/:id', asignacionController.deleteAsignacion);
 
 // Ruta para obtener las actividades con usuarios asignados
 router.get('/actividades/:idProyecto/usuarios-asignados', asignacionController.getActividadesConUsuariosAsignados);
+
+// Ruta para obtener actividades asignadas a un usuario empleado
+router.get('/actividades-asignadas', authenticate, asignacionController.getActividadesAsignadas);
 
 
 module.exports = router;
