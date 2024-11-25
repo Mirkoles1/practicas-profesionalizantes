@@ -30,14 +30,9 @@ const Dashboard = () => {
     }
   }, []);
 
-  // Si no se encontró un usuario, puedes redirigir o mostrar un mensaje
-  if (!user) {
-    return <div>No se encontró información de usuario. Por favor, inicie sesión.</div>;
-  }
-
   return (
     <div>
-      <h1>Bienvenido {user?.nombre_usuario}</h1>
+      <h1>¡Bienvenido {user ? user.nombre_usuario + "!" : "Invitado! Por favor, inicie sesión"}</h1>
       {user?.rol === 'admin' && <p>Eres administrador.</p>}
       <ul>
         {proyectos.map(proyecto => (

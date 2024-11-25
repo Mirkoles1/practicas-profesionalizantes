@@ -154,7 +154,7 @@ const checkProyectoCompletado = async (projectId) => {
     };
 
     return (
-        <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+        <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '60vh' }}>
             <Typography variant="h3" gutterBottom>
                 Matriz de Responsabilidades
             </Typography>

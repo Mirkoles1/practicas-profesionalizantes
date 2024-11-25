@@ -1,3 +1,19 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content {
+    flex: 1; /* Este se estirará para ocupar el espacio restante */
+}
+
 .App {
   text-align: center;
 }
@@ -37,9 +53,4 @@
   }
 }
 
-footer {
-  margin-top: auto; /* Esto empuja el pie de página hacia el fondo */
-  background-color: #f1f1f1; /* Cambia el color según tu preferencia */
-  padding: 10px;
-  text-align: center;
-}
+

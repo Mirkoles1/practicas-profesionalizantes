@@ -260,11 +260,15 @@ const ProjectDetails = () => {
   };
 
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-    <button
-    variant = "outlined"
-    onClick={()=> navigate("/matriz")}>
-    </button>
+    <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '75vh' }}>
+    <Button
+    variant="outlined"
+    color="primary"
+    onClick={()=> navigate("/matriz")}
+    style={{ position: 'absolute',
+      right: '5%',}}>
+    Volver a la matriz
+    </Button>
     {project && (
   <>
     <Typography variant="h4" gutterBottom>
@@ -401,6 +405,7 @@ const ProjectDetails = () => {
       Asignar
     </Button>
   </DialogActions>
+  
 </Dialog>
 
 
@@ -525,6 +530,7 @@ const ProjectDetails = () => {
       >
         <Alert severity={success ? 'success' : 'error'}>{success || error}</Alert>
       </Snackbar>
+      
     </div>
   );
 };
