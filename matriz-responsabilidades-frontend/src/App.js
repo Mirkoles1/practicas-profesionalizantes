@@ -15,7 +15,9 @@ import CrearProyecto from './Components/CrearProyecto';
 import Perfil from './Components/Perfil';
 import ProjectDetails from './Components/ProjectDetails';
 import ActivityDetails from './Components/ActivityDetails';
-import UserRoleProtectedComponent from './Components/EmpleadoActividades'
+import EmployeeProjectDetails from './Components/EmployeeProjectDetails';
+import EmployeeActivityDetails from './Components/EmployeeActivityDetails';
+import UserProjects from './Components/UserProjects';
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -69,6 +71,10 @@ const App = () => {
                     <Route path="/matriz" element={<ResponsibilityMatrix />} />
                     <Route path="/proyecto-detalle/:projectId" element={<ProjectDetails />} />
                     <Route path="/activity/:activityId" element={<ActivityDetails />} />
+                    <Route path="/employee/project/:projectId" element={<EmployeeProjectDetails />} />
+                    <Route path="/employee/activity/:activityId" element={<EmployeeActivityDetails />} />
+                    <Route path="/user/projects" element={<UserProjects />} />
+
 
                     {/* Ruta de login solo si el usuario no está logueado */}
                     <Route path="/login" element={user ? <Navigate to="/" /> : <LoginForm setUser={setUser} />} />
@@ -76,6 +82,7 @@ const App = () => {
                     {/* Perfil y SignUp */}
                     <Route path="/perfil" element={<Perfil />} />
                     <Route path="/signup" element={<SignUp />} />
+                    
                 </Routes>
             </div>
             <footer>

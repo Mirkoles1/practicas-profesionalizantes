@@ -39,8 +39,8 @@ const Navbar = ({ user, onLogout }) => {
                         </>
                     )}
                     {user?.rol === 'Empleado' && (
-                        <Button component={Link} to="/empleado/actividades" color="inherit">
-                            <Typography variant="button">Mis Actividades</Typography>
+                        <Button component={Link} to="/user/projects" color="inherit">
+                            <Typography variant="button">Mis Proyectos</Typography>
                         </Button>
                     )}
                 </Box>

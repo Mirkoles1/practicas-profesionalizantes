@@ -2,6 +2,7 @@
 const Asignacion = require('../models/Asignacion');
 const Actividad = require('../models/Actividad');
 const Usuario = require('../models/Usuario');
+const Proyecto = require('../models/Proyecto')
 
 // Crear una nueva asignación
 exports.createAsignacion = async (req, res) => {
@@ -147,5 +148,44 @@ exports.getActividadesConUsuariosAsignados = async (req, res) => {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Error al obtener las actividades con usuarios asignados.' });
+    }
+  };
+
+  exports.getActividadesAsignadas = async (req, res) => {
+    const id_usuario = req.user?.id_usuario; // Extraer ID del usuario autenticado del token
+  
+    try {
+      // Obtener asignaciones del usuario, incluyendo datos de la actividad y el proyecto relacionado
+      const asignaciones = await Asignacion.findAll({
+        where: { id_usuario },
+        include: [
+          {
+            model: Actividad,
+            attributes: ['id_actividad', 'nombre_actividad', 'descripcion', 'estadoActividad'],
+            include: {
+              model: Proyecto,
+              attributes: ['id_proyecto', 'nombre_proyecto'], // Opcional: Información del proyecto
+            },
+          },
+        ],
+      });
+  
+      if (!asignaciones.length) {
+        return res.status(404).json({ error: 'No tienes actividades asignadas.' });
+      }
+  
+      // Formatear los datos para devolver solo lo necesario
+      const actividades = asignaciones.map((asignacion) => ({
+        id_actividad: asignacion.Actividad.id_actividad,
+        nombre_actividad: asignacion.Actividad.nombre_actividad,
+        descripcion: asignacion.Actividad.descripcion,
+        estadoActividad: asignacion.Actividad.estadoActividad,
+        proyecto: asignacion.Actividad.Proyecto,
+      }));
+  
+      res.status(200).json(actividades);
+    } catch (error) {
+      console.error('Error al obtener actividades asignadas:', error);
+      res.status(500).json({ error: 'Error al obtener las actividades asignadas.' });
     }
   };
