@@ -25,7 +25,5 @@ router.post('/asignar', asignarProyectoEmpleado);
 // Ruta para obtener los empleados de un proyecto
 router.get('/proyectos/:id_proyecto/empleados', getEmpleadosByProyecto);
 
-// Ruta para obtener empleados por proyecto
-router.get('/proyecto/:id_proyecto/empleados', usuarioProyectoController.getEmpleadosPorProyecto);
 
 module.exports = router;

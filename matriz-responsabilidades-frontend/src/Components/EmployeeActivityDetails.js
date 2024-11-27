@@ -36,6 +36,12 @@ const EmployeeActivityDetails = () => {
   useEffect(() => {
     loadComentarios();
   }, []);
+
+  const handleUpdateAndCheck = async () => {
+    await updateState(); // Llamar a la función para actualizar el estado
+    await handleCheckProyecto(); // Luego verificar si el proyecto está completado
+  };
+
   // Obtener los detalles de la actividad
   useEffect(() => {
     const fetchActivity = async () => {
@@ -72,6 +78,21 @@ const EmployeeActivityDetails = () => {
       setError('Error al actualizar el estado.');
     }
   };
+
+  const handleCheckProyecto = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/proyectos/check-from-activity/${activityId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert(response.data.message);
+    } catch (error) {
+      console.error('Error al verificar el estado del proyecto:', error);
+      alert('Hubo un problema al verificar el estado del proyecto.');
+    }
+  };
+  
 
   const handleAddComentario = async () => {
     try {
@@ -138,10 +159,9 @@ const EmployeeActivityDetails = () => {
               <MenuItem value="Completada">Completada</MenuItem>
             </Select>
           </FormControl>
-          <Button variant="contained" color="primary" onClick={updateState}>
+          <Button variant="contained" color="primary" onClick={handleUpdateAndCheck}>
             Cambiar Estado
           </Button>
-
           <Typography variant="h5" style={{ marginTop: '20px' }}>
         Comentarios de Avance
       </Typography>

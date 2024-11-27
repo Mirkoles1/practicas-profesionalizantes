@@ -289,3 +289,53 @@ exports.getProyectosConProgreso = async (req, res) => {
     }
 };
 
+exports.checkProyectoFromActivity = async (req, res) => {
+    const { activityId } = req.params; // ID de la actividad desde los parámetros
+
+    try {
+        // Buscar la actividad específica por activityId
+        const actividad = await Actividad.findByPk(activityId);
+
+        if (!actividad) {
+            return res.status(404).json({ error: 'La actividad no existe' });
+        }
+
+        // Obtener el ID del proyecto al que pertenece la actividad
+        const idProyecto = actividad.id_proyecto;
+
+        // Buscar todas las actividades del proyecto
+        const actividades = await Actividad.findAll({
+            where: { id_proyecto: idProyecto },
+            attributes: ['estadoActividad'],
+        });
+
+        if (!actividades.length) {
+            return res.status(404).json({ error: 'El proyecto no tiene actividades asignadas' });
+        }
+
+        // Verificar si todas las actividades están completadas
+        const todasCompletadas = actividades.every(
+            (actividad) => actividad.estadoActividad === 'Completada'
+        );
+
+        if (todasCompletadas) {
+            // Actualizar el estado del proyecto a 'Completado'
+            const proyecto = await Proyecto.findByPk(idProyecto);
+
+            if (!proyecto) {
+                return res.status(404).json({ error: 'Proyecto no encontrado' });
+            }
+
+            await proyecto.update({ estado: 'Completado' });
+            return res.json({ message: 'El proyecto ha sido marcado como completado', proyecto });
+        } else {
+            return res.json({
+                message: 'El proyecto no puede ser marcado como completado, aún hay actividades pendientes',
+            });
+        }
+    } catch (error) {
+        console.error('Error al verificar el estado del proyecto desde la actividad:', error);
+        res.status(500).json({ error: 'Error al verificar el estado del proyecto' });
+    }
+};
+

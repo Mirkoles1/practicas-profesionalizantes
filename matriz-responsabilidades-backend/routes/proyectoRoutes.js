@@ -25,4 +25,7 @@ router.put('/proyecto/:id/check-completado', proyectoController.checkProyectoCom
 
 router.get('/proyectos/usuario/:id/progreso', proyectoController.getProyectosConProgreso);
 
+// Verificar el estado del proyecto desde activityId
+router.get('/check-from-activity/:activityId', proyectoController.checkProyectoFromActivity);
+
 module.exports = router;
