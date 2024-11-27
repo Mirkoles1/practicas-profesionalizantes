@@ -1,4 +1,3 @@
-// components/ResponsibilityMatrix.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -48,8 +47,6 @@ const ResponsibilityMatrix = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            
-
             setProjects(data);
         } catch (error) {
             handleApiError(error, 'Error al cargar los proyectos.');
@@ -57,45 +54,45 @@ const ResponsibilityMatrix = () => {
     };
 
     // Cargar proyectos asociados con el usuario y su progreso
-const loadProjectsProgreso = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user')); // Usuario desde localStorage
+    const loadProjectsProgreso = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user')); // Usuario desde localStorage
 
-        if (!token || !user) {
-            setError('No se encontró la sesión de usuario. Por favor, inicia sesión.');
-            return;
-        }
-
-        const { data } = await axios.get(
-            `${process.env.REACT_APP_API_URL}/proyectos/proyectos/usuario/${user.id_usuario}/progreso`,
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setProjects(data);
-    } catch (error) {
-        handleApiError(error, 'Error al cargar los proyectos con Progreso.');
-    }
-};
-
-const checkProyectoCompletado = async (projectId) => {
-    try {
-        const token = localStorage.getItem('token');
-        const { data } = await axios.put(
-            `${process.env.REACT_APP_API_URL}/proyectos/proyecto/${projectId}/check-completado`,
-            {},
-            {
-                headers: { Authorization: `Bearer ${token}` },
+            if (!token || !user) {
+                setError('No se encontró la sesión de usuario. Por favor, inicia sesión.');
+                return;
             }
-        );
 
-        setSuccess(data.message);
-        loadProjects(); // Recargar los proyectos para reflejar los cambios
-    } catch (error) {
-        handleApiError(error, 'Error al verificar el estado del proyecto.');
-    }
-};
+            const { data } = await axios.get(
+                `${process.env.REACT_APP_API_URL}/proyectos/proyectos/usuario/${user.id_usuario}/progreso`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
+            setProjects(data);
+        } catch (error) {
+            handleApiError(error, 'Error al cargar los proyectos con Progreso.');
+        }
+    };
+
+    // Verificación de si el proyecto está completado
+    const checkProyectoCompletado = async (projectId) => {
+        try {
+            const token = localStorage.getItem('token');
+            const { data } = await axios.put(
+                `${process.env.REACT_APP_API_URL}/proyectos/proyecto/${projectId}/check-completado`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            setSuccess(data.message);
+            loadProjects(); // Recargar los proyectos para reflejar los cambios
+        } catch (error) {
+            handleApiError(error, 'Error al verificar el estado del proyecto.');
+        }
+    };
 
     // Manejo de errores comunes de API
     const handleApiError = (error, defaultMessage) => {
@@ -105,6 +102,10 @@ const checkProyectoCompletado = async (projectId) => {
 
     // Manejar la apertura del modo de edición de proyecto
     const handleEditProject = (project) => {
+        if (project.estado === 'Completado') {
+            setError('Este proyecto está completado y no puede editarse.');
+            return;
+        }
         setProjectData({ nombre_proyecto: project.nombre_proyecto, descripcion: project.descripcion });
         setSelectedProjectId(project.id_proyecto);
         setEditMode(true);
@@ -191,6 +192,7 @@ const checkProyectoCompletado = async (projectId) => {
                                     color="secondary"
                                     style={{ marginTop: '10px', marginRight: '10px' }}
                                     onClick={() => handleEditProject(project)}
+                                    disabled={project.estado === 'Completado'} // Deshabilitar si está completado
                                 >
                                     Editar Proyecto
                                 </Button>
